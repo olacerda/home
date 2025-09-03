@@ -16,14 +16,14 @@ char	*get_next_line(int fd)
 {
 	static t_g	x[FD_SETSIZE];
 
-	*(t_w *)&x[fd] = (t_w){x[fd].s, x[fd].e += x[fd].b[x[fd].e] == 10, 0, 0, 0};
+	*(t_w *)&x[fd].s = (t_w){x[fd].e += x[fd].b[x[fd].e] == 10, 0, 0, 0};
 	if ((fd < 0 || BF <= 0 || BF > MAX))
 		return (NULL);
 	if (x[fd].rb <= 0 || x[fd].s >= x[fd].rb)
 		x[fd] = (t_g){BF, BF, 0, 0, 0, -1,{0}, 1};
 	while ((x[fd].ln == NULL || x[fd].b[x[fd].e] != 10) && x[fd].rb > 0)
 	{
-		(void)((x[fd].s >= x[fd].rb) && (x[fd].rb = read(fd, x[fd].b, BF)));
+		(void)((x[fd].s >= x[fd].rb) && (x[fd].rb = read(fd, x[fd].b, BUFFER_SIZE)));
 		(void)((x[fd].s >= x[fd].rb) && (*(long *)&(x[fd].s) = 0));
 		while ((x[fd].b[x[fd].e] != 10) && (x[fd].e < x[fd].rb) && ++(x[fd].e))
 			++(x[fd].t);

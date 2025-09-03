@@ -6,7 +6,7 @@
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 17:00:46 by olacerda          #+#    #+#             */
-/*   Updated: 2025/09/01 16:50:58 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/02 04:08:39 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,14 +18,14 @@ char	*get_next_line(int fd)
 
 	if ((fd < 0 || BUFFER_SIZE <= 0 || BUFFER_SIZE > MAX))
 		return (NULL);
-	*(t_w *)&x = (t_w){0, -1, x.start, x.end += (x.buff[x.end]) == 10, 0, 0};
+	*(t_w *)&x = (t_w){0, -1, x.start, x.end + ((x.buff[x.end]) == 10), 0, 0};
 	if (x.rbts <= 0 || x.start >= x.rbts)
 		x = (t_g){NULL, -1, BUFFER_SIZE, BUFFER_SIZE, NULL, 0, 1, {0}};
 	while ((x.line == NULL || x.buff[x.end] != 10) && x.rbts > 0)
 	{
 		(void)((x.start >= x.rbts) && (x.rbts = read(fd, x.buff, BUFFER_SIZE)));
 		(void)((x.start >= x.rbts) && (*(long *)&x.start = 0));
-		while ((x.buff[x.end] != 10) && (x.end < x.rbts) && ++(x.end))
+		while ((x.end < x.rbts) && (x.buff[x.end] != 10) && ++(x.end))
 			++(x.totalend);
 		x.nline = malloc(x.totalend + 1 + (x.buff[x.end] == 10) * sizeof(char));
 		if (!x.nline)
@@ -95,3 +95,4 @@ int	main(void)
 	free(line4);
 	free(line5);
 }
+

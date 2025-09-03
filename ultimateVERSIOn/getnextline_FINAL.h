@@ -6,7 +6,7 @@
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 17:01:33 by olacerda          #+#    #+#             */
-/*   Updated: 2025/09/01 16:34:01 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/02 04:08:53 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -35,7 +35,7 @@ typedef struct s_g
 	char	*nline;
 	int		totalend;
 	int		rbts;
-	char	buff[BUFFER_SIZE];
+	char	buff[BUFFER_SIZE + 1];
 }	t_g;
 
 typedef struct s_w

@@ -6,7 +6,7 @@
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 18:38:18 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/08/31 20:39:01 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/02 16:22:10 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -22,6 +22,7 @@
 # ifndef MAX
 #  define MAX 4000000
 # endif
+# define X x[fd]
 
 # include <unistd.h>
 # include <stdio.h>
@@ -43,7 +44,6 @@ typedef struct s_g
 
 typedef struct s_w
 {
-	int		start; 
 	int		end;
 	char	*nline;
 	int		t;
