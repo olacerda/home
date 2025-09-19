@@ -6,7 +6,7 @@
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/19 18:05:01 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/19 19:31:59 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -452,11 +452,10 @@ int	callback(int code, void *arg)
 	// }
 //-----------------------------
 		
-	// Atualiza o bloco quando o player atravessa o limite do bloco
+	// Atualiza o INDEX do player na MATRIZ!!
 	all->play->column = all->play->pixel_column / 64;
 	all->play->line = all->play->pixel_line / 64;
 
-	// Desenho usando posição em pixels
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
 	// update_images(all->mlx, all->window, all, previous_pixel_column, previous_pixel_line);
 	mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, previous_pixel_column, previous_pixel_line);
