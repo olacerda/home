@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_backup4.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/22 13:54:47 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/22 03:45:55 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,17 +168,17 @@ void	sheet_to_image_convertor(t_sheet *src, t_image *dst, t_image *background, i
 	printf("\nsrc_index: %d\nsrc_sizeline: %d\nsrc_tall: %d\ndst_sizeline %d\ndst_tall: %d\ndst_wide: %d\nsrc_bpp: %d\n\n", src_idx, src->sizeline, src->tall, dst->sizeline, dst->tall, dst->wide, src->bpp);
 	// if (src_idx > ((src->sizeline * src->tall) - (dst->sizeline * dst->tall)))
 	// 	return ;
-	(void)ints_per_line;
+	
 	while (img_line < dst->tall)
 	{
 		count = 0;
-		while(count < 64)
+		while(count < ints_per_line)
 		{
 			// (void)background;
 			if (((int *)src->img)[src_idx] == -16777216)
 				((int *)dst->img)[dst_idx] = ((int *)background->img)[dst_idx];
 				// teste++;
-			else
+			else if (((int *)src->img)[src_idx] != -16777216)
 				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
 			dst_idx++;
 			src_idx++;
@@ -187,101 +187,6 @@ void	sheet_to_image_convertor(t_sheet *src, t_image *dst, t_image *background, i
 		img_line++;
 		src_idx = src_idx + ((src->sizeline / 4) - (count));
 		// (img_line * src->sizeline) + (dst->sizeline * (sprite_line - 1));
-	}
-}
-
-void	update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_playerinfo *play)
-{
-	int	ints_per_line;
-	int	img_line;
-	int src_idx;
-	int	dst_idx;
-	int	count;
-	int	grid_line = (play->pixel_line / 64) * 64;
-	int	grid_column = (play->pixel_column / 64) * 64;
-	
-	int	difference_line = play->pixel_line - grid_line;
-	int	difference_column = play->pixel_column - grid_column;
-	
-	// int	background_column = difference_column;
-	// int	background_line = difference_line * (background->sizeline / 4);
-	
-	// int	background_index = (background_column + background_line);
-	int	background_index = 0;
-
-	// int	background_column_limit = (background_line + background->sizeline) / 4; // pode substituir primeira parte por "background_line"
-	// int	background_line_limit = ((background->tall * (background->sizeline / 4)) - background_index);
-	
-	// int teste = 0;
-	// int fundo = ((int *)src->img)[0];
-	int bg_line = 0;
-	int bg_column = 0;
-
-	// printf("\nINT DO FUNDO: ---------> %d\n", fundo);
-	
-	ints_per_line = ((src->bpp * dst->wide) / 32);
-	src_idx = ((dst->sizeline / 4) * (sprite_column - 1)) + ((src->sizeline / 4) * ((sprite_line - 1) * dst->tall));
-	img_line = 0;
-	dst_idx = 0;
-	printf("\nsrc_index: %d\nsrc_sizeline: %d\nsrc_tall: %d\ndst_sizeline %d\ndst_tall: %d\ndst_wide: %d\nsrc_bpp: %d\n\n", src_idx, src->sizeline, src->tall, dst->sizeline, dst->tall, dst->wide, src->bpp);
-	// if (src_idx > ((src->sizeline * src->tall) - (dst->sizeline * dst->tall)))
-	// 	return ;
-	// (void)ints_per_line;
-	// while (img_line < dst->tall)
-	// {
-	// 	count = 0;
-	// 	while(count < ints_per_line)
-	// 	{
-	// 		// (void)background;
-	// 		if (((int *)src->img)[src_idx] == -16777216)
-	// 			((int *)dst->img)[dst_idx] = ((int *)background->img)[background_index];
-	// 			// teste++;
-	// 		else
-	// 			((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-	// 		background_index++;
-	// 		dst_idx++;
-	// 		src_idx++;
-	// 		count++;
-	// 		if (background_index >= background_column_limit)
-	// 			background_index = background_line;
-	// 	}
-	// 	// background_index += background->sizeline / 4;
-	// 	background_column_limit += background->sizeline / 4;
-	// 	if (background_column_limit >= background_line_limit)
-	// 		background_column_limit = (background->sizeline / 4);
-	// 	if (background_index >= background_line_limit)
-	// 		background_index = background_column;
-	// 	img_line++;
-	// 	background_line = (difference_line + img_line) * (background->sizeline / 4);
-	// 	if (background_line >= background_line_limit - background->sizeline)
-	// 		background_line = 0;
-	// 	src_idx = src_idx + ((src->sizeline / 4) - (count));
-	// 	// (img_line * src->sizeline) + (dst->sizeline * (sprite_line - 1));
-	// }
-	while (img_line < dst->tall)
-	{
-		count = 0;
-		while (count < ints_per_line)
-		{
-			bg_line = (difference_column + count); // % background->wide
-			if (bg_line >= background->wide)
-				bg_line = bg_line - background->wide;
-			bg_column = (difference_line + img_line); // % background->tall
-			if (bg_column >= background->tall)
-				bg_column = bg_column - background->tall;
-			background_index = bg_column * (background->sizeline / 4) + bg_line;
-
-			if (((int *)src->img)[src_idx] == -16777216)
-				((int *)dst->img)[dst_idx] = ((int *)background->img)[background_index];
-			else
-				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-
-			dst_idx++;
-			src_idx++;
-			count++;
-		}
-		img_line++;
-		src_idx = src_idx + ((src->sizeline / 4) - count);
 	}
 }
 
@@ -423,86 +328,25 @@ int	check_letters_colected(t_all *all)
 	return (1);	
 }
 
-// //FUNCIONANDO
-// void	update_player_range(t_all *all)
-// {
-// 	printf("Entrou no update_player_range ---------->>\n");
-// 	all->play->tl_range = all->map->map[all->play->pixel_line / 64][all->play->pixel_column / 64];
-// 	all->play->tr_range = all->map->map[all->play->pixel_line / 64][(all->play->pixel_column + 63) / 64];
-// 	all->play->bl_range = all->map->map[(all->play->pixel_line + 63) / 64][all->play->pixel_column / 64];
-// 	all->play->br_range = all->map->map[(all->play->pixel_line + 63) / 64][(all->play->pixel_column + 63) / 64];
-// 	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
-// }
-
-// substituir a adicao pelo numero "48" pra ver se consegue entrar um pouco na imagem antes de coletar ela
-void	update_player_range(t_all *all)
-{
-	printf("Entrou no update_player_range ---------->>\n");
-	all->play->tl_range = all->map->map[(all->play->pixel_line + 15) /64][(all->play->pixel_column + 15) / 64];
-	all->play->tr_range = all->map->map[(all->play->pixel_line + 15) / 64][(all->play->pixel_column + 47) / 64];
-	all->play->bl_range = all->map->map[(all->play->pixel_line + 47) / 64][(all->play->pixel_column + 15) / 64];
-	all->play->br_range = all->map->map[(all->play->pixel_line + 47) / 64][(all->play->pixel_column + 47) / 64];
-	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
-}
-
-void	update_range_image(t_all *all, int	line, int column)
-{
-	int	grid_pixel_line;
-	int	grid_pixel_column;
-
-	printf("entrou no update_range_image----------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
-	grid_pixel_line = line * 64;
-	grid_pixel_column = column * 64;
-	all->map->map[line][column] = '0';
-	printf("Passou do map[location] = '0'\n\n");
-	mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, grid_pixel_column, grid_pixel_line);
-}
-
-int	check_player_range(t_all *all, char element)
-{
-	printf("entrou no CHECK_PLAYER_RANGE----------->>>>>>>>>>>>>>>>>\n\n");
-	if (all->play->tl_range == element)
-	{
-		update_range_image(all, (all->play->pixel_line / 64), (all->play->pixel_column / 64));
-		return (1);
-	}
-	if (all->play->tr_range == element)
-	{
-		update_range_image(all, (all->play->pixel_line / 64), ((all->play->pixel_column + 63) / 64));
-		return (1);
-	}
-	if (all->play->bl_range == element)
-	{
-		update_range_image(all, ((all->play->pixel_line + 63) / 64), (all->play->pixel_column / 64));
-		return (1);
-	}
-	if (all->play->br_range == element)
-	{
-		update_range_image(all, ((all->play->pixel_line + 63) / 64), ((all->play->pixel_column + 63) / 64));
-		return (1);
-	}
-	return (0);
-}
-
 void	update_game(t_all *all)
 {
-	if ((check_player_range(all, 'C') == 1) && (all->states->full_colectables == 0))
+	if (all->map->map[all->play->line][all->play->column] == 'C' && all->states->full_colectables == 0)
 	{
 		write(1, "\a", 1);
 		all->play->colected++;
 		if (all->play->colected >= all->game->count_elements[2])
 			all->states->full_colectables = 1;
-		// all->map->map[all->play->line][all->play->column] = '0';
+		all->map->map[all->play->line][all->play->column] = '0';
 	}
-	if ((check_player_range(all, 'R') == 1) || 
-		(check_player_range(all, 'X') == 1) || 
-		(check_player_range(all, 'I') == 1) || 
-		(check_player_range(all, 'T') == 1))
+	if (all->map->map[all->play->line][all->play->column] == 'R' || 
+		all->map->map[all->play->line][all->play->column] == 'X' || 
+		all->map->map[all->play->line][all->play->column] == 'I' || 
+		all->map->map[all->play->line][all->play->column] == 'T')
 	{
 		write(1, "\a", 1);
 		if (check_letters_colected(all) == 1)
 			all->states->right_letters = 1;
-		// all->map->map[all->play->line][all->play->column] = '0';		
+		all->map->map[all->play->line][all->play->column] = '0';		
 	}
 	printf("\nCOLECTED: %d\n", all->play->colected);
 	printf("Letter State: %d\nCoin State: %d\n\n", all->states->right_letters, all->states->full_colectables);
@@ -548,100 +392,21 @@ void	update_game(t_all *all)
 // 	return (0);
 // }
 
-// int	callback(int code, void *arg)
-// {
-// 	// static int steps;
-// 	t_all *all = (t_all *)arg;
-// 	static int	previous_pixel_column;
-// 	static int	previous_pixel_line;
-// 	int speed = 64;
-
-// 	previous_pixel_column = all->play->pixel_column;
-// 	previous_pixel_line = all->play->pixel_line;
-// 	(void)code;
-// 	// if (code == 100 || code == 97 || code == 119 || code == 115)
-// 	// 	steps++;
-// 	// write(1, "Steps: ", 7);
-// 	// putnumber(steps);
-// 	// write(1, "\n", 1);
-// // -------------------------------
-// 	// while (code == 100)
-// 	// {
-// 		if ((all->states->key_d == 1) && (all->map->map[(all->play->pixel_line + 63) / 64][(all->play->pixel_column + 63 + speed) / 64] != '1') 
-// 			&& (all->map->map[all->play->pixel_line / 64][(all->play->pixel_column + 63 + speed) / 64] != '1'))
-// 			// (code == 100 && all->map->map[(all->play->pixel_line + 64) / 64][(all->play->pixel_column + 64 + 10 - 1) / 64] != '1'))
-// 			all->play->pixel_column += speed;
-// 		else if ((all->states->key_d == 1) && (all->map->map[(all->play->pixel_line + 63) / 64][(all->play->pixel_column + 63 + 1) / 64] != '1') && 
-// 			(all->map->map[all->play->pixel_line / 64][(all->play->pixel_column + 63 + 1) / 64] != '1'))
-// 			all->play->pixel_column += 1;
-// 		// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, previous_pixel_column, previous_pixel_line);
-// 		// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
-// 	// }
-
-// 	// esquerda
-// 	// while (code == 97)
-// 	// {
-// 		if ((all->states->key_a == 1) && (all->map->map[(all->play->pixel_line) / 64][(all->play->pixel_column - speed) / 64] != '1') && 
-// 			(all->map->map[(all->play->pixel_line + 63) / 64][(all->play->pixel_column - speed) / 64] != '1'))
-// 			// (code == 97 && all->map->map[(all->play->pixel_line + 64) / 64][(all->play->pixel_column - 10 - 1) / 64] != '1'))
-// 			all->play->pixel_column -= speed;
-// 		else if ((all->states->key_a == 1) && (all->map->map[(all->play->pixel_line) / 64][(all->play->pixel_column - 1) / 64] != '1') && 
-// 			(code == 97 && all->map->map[(all->play->pixel_line + 63) / 64][(all->play->pixel_column - 1) / 64] != '1'))
-// 			all->play->pixel_column -= 1;
-// 	// }
-// 	// cima
-// 	// while (code == 19)
-// 	// {
-// 		if ((all->states->key_w == 1) && (all->map->map[(all->play->pixel_line - speed) / 64][all->play->pixel_column / 64] != '1') &&
-// 			(all->map->map[(all->play->pixel_line - speed) / 64][(all->play->pixel_column + 63) / 64] != '1'))
-// 			// (code == 119 && all->map->map[(all->play->pixel_line - 10 - 1 + 64) / 64][all->play->pixel_column / 64] != '1'))
-// 			all->play->pixel_line -= speed;
-// 		else if ((all->states->key_w == 1) && (all->map->map[(all->play->pixel_line - 1) / 64][all->play->pixel_column / 64] != '1') &&
-// 			(all->map->map[(all->play->pixel_line - 1) / 64][(all->play->pixel_column + 63) / 64] != '1'))
-// 			all->play->pixel_line -= 1;		
-// 	// }
-// 	// baixo
-// 	// while (code == 115)
-// 	// {
-// 		if ((all->states->key_s == 1) && (all->map->map[(all->play->pixel_line + 63 + speed) / 64][(all->play->pixel_column + 63) / 64] != '1') &&
-// 				(all->map->map[(all->play->pixel_line + 63 + speed) / 64][all->play->pixel_column / 64] != '1'))
-// 			// (code == 115 && all->map->map[(all->play->pixel_line + 64 + 10 - 1) / 64][all->play->pixel_column / 64] != '1'))
-// 			all->play->pixel_line += speed;
-// 		else if ((all->states->key_s == 1) && (all->map->map[(all->play->pixel_line + 63 + 1) / 64][(all->play->pixel_column + 63) / 64] != '1') &&
-// 				(all->map->map[(all->play->pixel_line + 63 + 1) / 64][all->play->pixel_column / 64] != '1'))
-// 			all->play->pixel_line += 1;		
-// 	// }
-// //-----------------------------
-		
-// 	// Atualiza o INDEX do player na MATRIZ!!
-// 	all->play->column = all->play->pixel_column / 64;
-// 	all->play->line = all->play->pixel_line / 64;
-
-// 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
-// 	// update_images(all->mlx, all->window, all, previous_pixel_column, previous_pixel_line);
-// 	// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, previous_pixel_column, previous_pixel_line);
-// 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
-// 	update_player_range(all);
-// 	update_game(all);                                               
-// 	return (0);
-// }
-
-int	callback(int code, void *arg)
+int	key_work(int code, void *arg)
 {
-	// static int steps;
+	static int steps;
 	t_all *all = (t_all *)arg;
-	// static int	previous_pixel_column;
-	// static int	previous_pixel_line;
-	int speed = 1;
+	static int	previous_pixel_column;
+	static int	previous_pixel_line;
+	int speed = 10;
 
-	all->play->p_pixel_column = all->play->pixel_column;
-	all->play->p_pixel_line = all->play->pixel_line;
-	(void)code;
-	// if (code == 100 || code == 97 || code == 119 || code == 115)
-	// 	steps++;
-	// write(1, "Steps: ", 7);
-	// putnumber(steps);
-	// write(1, "\n", 1);
+	previous_pixel_column = all->play->pixel_column;
+	previous_pixel_line = all->play->pixel_line;
+	if (code == 100 || code == 97 || code == 119 || code == 115)
+		steps++;
+	write(1, "Steps: ", 7);
+	putnumber(steps);
+	write(1, "\n", 1);
 // -------------------------------
 	// while (code == 100)
 	// {
@@ -698,19 +463,16 @@ int	callback(int code, void *arg)
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
 	// update_images(all->mlx, all->window, all, previous_pixel_column, previous_pixel_line);
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, previous_pixel_column, previous_pixel_line);
-	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
-	// mlx_do_sync(all->mlx);
-	update_player_range(all);
+	mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
 	update_game(all);                                               
 	return (0);
 }
 
-int	check_key_pressed(int	code, void *arg)
+void	check_key_pressed(int	code, void *arg)
 {
 	t_all	*all;
 
 	all = (t_all *)arg;
-	printf("entrou no key pressed\n");
 	if (code == 100)
 		all->states->key_d = 1;
 	if (code == 97)
@@ -719,16 +481,13 @@ int	check_key_pressed(int	code, void *arg)
 		all->states->key_w = 1;
 	if (code == 115)
 		all->states->key_s = 1;
-	// callback(code, all);
-	return (0);
 }
 
-int	check_key_released(int code, void *arg)
+void	check_key_released(int code, void *arg)
 {
 	t_all	*all;
 
 	all = (t_all *)arg;
-	printf("entrou no key released\n");
 	if (code == 100)
 		all->states->key_d = 0;
 	if (code == 97)
@@ -737,66 +496,15 @@ int	check_key_released(int code, void *arg)
 		all->states->key_w = 0;
 	if (code == 115)
 		all->states->key_s = 0;
-	// callback(code, all);
-	return (0);
 }
 
-// void	update_sprite(t_image src, t_image *background, t_image *player_sprite, t_playerinfo *play)
-// {
-// 	int	ints_per_line;
-// 	int	img_line;
-// 	int src_idx;
-// 	int	dst_idx;
-// 	int	count;
-// 	// int teste = 0;
-// 	// int fundo = ((int *)src->img)[0];
-
-// 	// printf("\nINT DO FUNDO: ---------> %d\n", fundo);
-// 	ints_per_line = ((src->bpp * dst->wide) / 32);
-// 	src_idx = ((dst->sizeline / 4) * (sprite_column - 1)) + ((src->sizeline / 4) * ((sprite_line - 1) * dst->tall));
-// 	img_line = 0;
-// 	dst_idx = 0;
-// 	printf("\nsrc_index: %d\nsrc_sizeline: %d\nsrc_tall: %d\ndst_sizeline %d\ndst_tall: %d\ndst_wide: %d\nsrc_bpp: %d\n\n", src_idx, src->sizeline, src->tall, dst->sizeline, dst->tall, dst->wide, src->bpp);
-// 	// if (src_idx > ((src->sizeline * src->tall) - (dst->sizeline * dst->tall)))
-// 	// 	return ;
-// 	// (void)ints_per_line;
-// 	while (img_line < dst->tall)
-// 	{
-// 		count = 0;
-// 		while(count < ints_per_line)
-// 		{
-// 			// (void)background;
-// 			if (((int *)src->img)[src_idx] == -16777216)
-// 				((int *)dst->img)[dst_idx] = ((int *)background->img)[dst_idx];
-// 				// teste++;
-// 			else
-// 				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-// 			dst_idx++;
-// 			src_idx++;
-// 			count++;
-// 		}
-// 		img_line++;
-// 		src_idx = src_idx + ((src->sizeline / 4) - (count));
-// 		// (img_line * src->sizeline) + (dst->sizeline * (sprite_line - 1));
-// 	}
-// }
-//------------------------------------------------------------------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 int game_loop(void *arg)
 {
     t_all *all;
 
     all = (t_all *)arg;
 	if (all->states->full_colectables == 1 && all->states->right_letters == 1)
-		make_sound(50000);
-	if (all->states->key_a != 0 || all->states->key_w != 0 || all->states->key_s != 0 || all->states->key_d != 0)
-	{
-		callback(1, all);
-		usleep(1000);
-		// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
-		update_background(all->images->letters_sheet, all->images->player, all->images->grass, 1, 6, all->play);
-	}
-	mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
-	mlx_do_sync(all->mlx);
+		make_sound(200000);
     return (0);
 }
 
@@ -812,11 +520,9 @@ void	game_initializer(t_mapinfo *s_map, t_all *all)
 	if (!(all->window))
 		exit (1);
 	put_images(all->mlx, s_map, all->window, images);
-	// mlx_key_hook(all->window, callback, all);
-	// mlx_hook(all->window, 2, 0, check_key_pressed, all);
-	// mlx_hook(all->window, 3, 0, check_key_released, all);
-	mlx_hook(all->window, 2, 1L<<0, check_key_pressed, all);
-	mlx_hook(all->window, 3, 1L<<1, check_key_released, all);
+	mlx_key_hook(all->window, callback, all);
+	mlx_hook(all->window, 2, 0, check_key_pressed, all);
+	mlx_hook(all->window, 3, 0, check_key_released, all);
 	mlx_loop_hook(all->mlx, game_loop, all);
 	mlx_loop(all->mlx);
 }
@@ -845,7 +551,7 @@ int	main(int argc, char *argv[])
 	if (argc != 2)
 		return (1);
 	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
-	*s_play = (t_playerinfo){0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0'};
+	*s_play = (t_playerinfo){0, 0, 0, 0, 0, {0}, 0, 0};
 	*s_game = (t_gameinfo){0, 0, 0, 0, 0};
 	*states = (t_states){0, 0, 0, 0, 0, 0};
 	all->map = s_map;
@@ -872,7 +578,7 @@ int	main(int argc, char *argv[])
 		return (1);
 	if (!check_elements(s_map, s_play, s_game))
 		return (1);
-	if (!check_all_paths(s_map, s_play, s_game))
+	if (!check_path(s_map, s_play, s_game))
 		return (1);
 	if (!check_map_size(all))
 		return (1);

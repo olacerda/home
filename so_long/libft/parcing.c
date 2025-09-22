@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parcing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 00:32:16 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/19 11:34:17 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/22 11:57:30 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "utils.h"
 
@@ -101,7 +101,7 @@ void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 		while ((s_map->map[line][++column]) && s_map->map[line][column] != '\n')
 		{
 			if (s_map->map[line][column] == 'P')
-				*s_play = (t_playerinfo){line, column, 0, 0, 0, {0}, line * 64, column * 64};
+				*s_play = (t_playerinfo){line, column, 0, 0, 0, {0}, line * 64, column * 64, 0, 0, '\0', '\0', '\0', '\0'};
 			if (s_map->map[line][column] == 'E')
 			{
 				s_game->e_line = line;
@@ -152,7 +152,7 @@ int	path_to_colectable(char **map, int	line, int column, int *colectables)
 {
 	if ((column == 0) || line == 0 || map[line] == NULL || 
 		map[line][column] == '\n' || map[line][column] == '\0' || 
-		map[line][column] == '7')
+		map[line][column] == '7' || map[line][column] == '1')
 		return (0);
 	if (map[line][column] == 'C')
 		(colectables[0])--;
@@ -172,7 +172,7 @@ int	path_to_colectable(char **map, int	line, int column, int *colectables)
 	return (0);
 }
 
-int	check_path(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
+int	check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 {
 	// char **map;
 	int	line;

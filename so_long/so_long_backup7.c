@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_backup7.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/22 13:54:47 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/22 13:06:41 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,19 +203,16 @@ void	update_background(t_sheet *src, t_image *dst, t_image *background, int spri
 	int	difference_line = play->pixel_line - grid_line;
 	int	difference_column = play->pixel_column - grid_column;
 	
-	// int	background_column = difference_column;
-	// int	background_line = difference_line * (background->sizeline / 4);
+	int	background_line = difference_column;
+	int	background_column = difference_line * (background->sizeline / 4);
 	
-	// int	background_index = (background_column + background_line);
-	int	background_index = 0;
+	int	background_index = (background_line + background_column);
 
-	// int	background_column_limit = (background_line + background->sizeline) / 4; // pode substituir primeira parte por "background_line"
-	// int	background_line_limit = ((background->tall * (background->sizeline / 4)) - background_index);
+	int	background_column_limit = (background_column + background->sizeline) / 4; // pode substituir primeira parte por "background_column"
+	int	background_line_limit = ((background->tall * (background->sizeline / 4)) - background_index);
 	
 	// int teste = 0;
 	// int fundo = ((int *)src->img)[0];
-	int bg_line = 0;
-	int bg_column = 0;
 
 	// printf("\nINT DO FUNDO: ---------> %d\n", fundo);
 	
@@ -226,62 +223,37 @@ void	update_background(t_sheet *src, t_image *dst, t_image *background, int spri
 	printf("\nsrc_index: %d\nsrc_sizeline: %d\nsrc_tall: %d\ndst_sizeline %d\ndst_tall: %d\ndst_wide: %d\nsrc_bpp: %d\n\n", src_idx, src->sizeline, src->tall, dst->sizeline, dst->tall, dst->wide, src->bpp);
 	// if (src_idx > ((src->sizeline * src->tall) - (dst->sizeline * dst->tall)))
 	// 	return ;
-	// (void)ints_per_line;
-	// while (img_line < dst->tall)
-	// {
-	// 	count = 0;
-	// 	while(count < ints_per_line)
-	// 	{
-	// 		// (void)background;
-	// 		if (((int *)src->img)[src_idx] == -16777216)
-	// 			((int *)dst->img)[dst_idx] = ((int *)background->img)[background_index];
-	// 			// teste++;
-	// 		else
-	// 			((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-	// 		background_index++;
-	// 		dst_idx++;
-	// 		src_idx++;
-	// 		count++;
-	// 		if (background_index >= background_column_limit)
-	// 			background_index = background_line;
-	// 	}
-	// 	// background_index += background->sizeline / 4;
-	// 	background_column_limit += background->sizeline / 4;
-	// 	if (background_column_limit >= background_line_limit)
-	// 		background_column_limit = (background->sizeline / 4);
-	// 	if (background_index >= background_line_limit)
-	// 		background_index = background_column;
-	// 	img_line++;
-	// 	background_line = (difference_line + img_line) * (background->sizeline / 4);
-	// 	if (background_line >= background_line_limit - background->sizeline)
-	// 		background_line = 0;
-	// 	src_idx = src_idx + ((src->sizeline / 4) - (count));
-	// 	// (img_line * src->sizeline) + (dst->sizeline * (sprite_line - 1));
-	// }
+	(void)ints_per_line;
 	while (img_line < dst->tall)
 	{
 		count = 0;
-		while (count < ints_per_line)
+		while(count < ints_per_line)
 		{
-			bg_line = (difference_column + count); // % background->wide
-			if (bg_line >= background->wide)
-				bg_line = bg_line - background->wide;
-			bg_column = (difference_line + img_line); // % background->tall
-			if (bg_column >= background->tall)
-				bg_column = bg_column - background->tall;
-			background_index = bg_column * (background->sizeline / 4) + bg_line;
-
+			// (void)background;
 			if (((int *)src->img)[src_idx] == -16777216)
 				((int *)dst->img)[dst_idx] = ((int *)background->img)[background_index];
+				// teste++;
 			else
 				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-
+			background_index++;
 			dst_idx++;
 			src_idx++;
 			count++;
+			if (background_index >= background_column_limit)
+				background_index = background_column;
 		}
+		// background_index += background->sizeline / 4;
+		background_column += background->sizeline / 4;
+		if (background_column >= background_line_limit - background->sizeline)
+			background_column = 0;
+		background_column_limit += background->sizeline / 4;
+		if (background_column_limit >= background_line_limit)
+			background_column_limit = (background->sizeline / 4);
+		if (background_index >= background_line_limit)
+			background_index = background_line;
 		img_line++;
-		src_idx = src_idx + ((src->sizeline / 4) - count);
+		src_idx = src_idx + ((src->sizeline / 4) - (count));
+		// (img_line * src->sizeline) + (dst->sizeline * (sprite_line - 1));
 	}
 }
 
@@ -791,7 +763,7 @@ int game_loop(void *arg)
 	if (all->states->key_a != 0 || all->states->key_w != 0 || all->states->key_s != 0 || all->states->key_d != 0)
 	{
 		callback(1, all);
-		usleep(1000);
+		usleep(20000);
 		// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
 		update_background(all->images->letters_sheet, all->images->player, all->images->grass, 1, 6, all->play);
 	}

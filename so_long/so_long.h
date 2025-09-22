@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 21:54:15 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/19 11:52:57 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/22 11:53:41 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #ifndef SO_LONG_H
 # define SO_LONG_H
@@ -19,6 +19,10 @@ typedef struct s_states
 {
 	int	full_colectables;
 	int	right_letters;
+	int	key_w;
+	int	key_a;
+	int	key_s;
+	int	key_d;
 } t_states;
 
 typedef struct s_gameinfo
@@ -40,6 +44,12 @@ typedef struct s_playerinfo
 	char	letter_colected[4];
 	int	pixel_line;
 	int	pixel_column;
+	int p_pixel_line;
+	int	p_pixel_column;
+	char	tl_range;
+	char	tr_range;
+	char	bl_range;
+	char	br_range;
 }	t_playerinfo;
 
 typedef struct s_mapinfo
@@ -134,6 +144,14 @@ void 			make_sound(long frequency);
 int				game_loop(void *arg);
 int				check_map_size(t_all *all);
 int				check_letters_colected(t_all *all);
+
+int				check_key_pressed(int	code, void *arg);
+int				check_key_released(int code, void *arg);
+
+void			update_player_range(t_all *all);
+void			update_range_image(t_all *all, int	line, int column);
+int				check_player_range(t_all *all, char element);
+void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_playerinfo *play);
 
 
 #endif
