@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parcing.c                                          :+:      :+:    :+:   */
+/*   parcing_backup2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 00:32:16 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/24 01:18:50 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/24 01:15:37 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 	}
 }
 
-void	get_element_positions(t_all *all)
+void	get_all_positions(t_all *all)
 {
 	int	line;
 	int	column;

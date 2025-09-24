@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.h                                          :+:      :+:    :+:   */
+/*   so_long_backup3.h                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 21:54:15 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/24 01:13:01 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/23 23:56:25 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,6 @@
 # define SO_LONG_H
 
 typedef struct timeval t_time;
-
-typedef struct s_element
-{
-	char	charr;
-	int		count;
-	int		line;
-	int		column;
-} t_element;
 
 typedef struct s_states
 {
@@ -36,8 +28,7 @@ typedef struct s_states
 typedef struct s_gameinfo
 {
 	char	*elements;
-	t_element *element;
-	// int		*count_elements;
+	int		*count_elements;
 	int		e_line;
 	int		e_column;
 	int		won;
@@ -161,5 +152,6 @@ void			update_player_range(t_all *all);
 void			update_range_image(t_all *all, int	line, int column);
 int				check_player_range(t_all *all, char element);
 void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_playerinfo *play);
+
 
 #endif

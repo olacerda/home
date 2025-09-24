@@ -1,25 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   teste3.c                                           :+:      :+:    :+:   */
+/*   testerapido.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/19 19:33:14 by olacerda          #+#    #+#             */
-/*   Updated: 2025/09/23 23:16:47 by otlacerd         ###   ########.fr       */
+/*   Created: 2025/09/23 21:40:24 by otlacerd          #+#    #+#             */
+/*   Updated: 2025/09/23 21:42:20 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 
-int	main(void)
+int	main()
 {
-	struct s_tipo {int a, b, c; char *d, *e;} struct1 = {1, 2, 3, "Teste", "Banana"};
-	printf("%d\n%d\n%d\n\n", struct1.a, struct1.b, struct1.c);
-	*(long *)&struct1 = ((48L << 32) + 116);
-	printf("%d\n%d\n%d\n", struct1.a, struct1.b, struct1.c);
-	// printf("%li\n", 1l << 32);
+	struct s_tipo {char a, b;} teste = {'a', 'b'};
+	printf("%li\n", sizeof(struct s_tipo));
+	printf("%li\n", sizeof(struct s_tipo *));
 }
-
-
-// 00000000 00000000 00000000 00000001       00000000 00000000 00000000 00000001

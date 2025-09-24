@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_backup10.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/24 01:35:26 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/24 01:14:59 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -792,7 +792,7 @@ int game_loop(void *arg)
 	{
 		callback(1, all);
 		update_background(all->images->letters_sheet, all->images->player, all->images->grass, 1, 6, all->play);
-		// mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
+		mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
 		mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
 		mlx_do_sync(all->mlx);
 		usleep(10000);
@@ -858,7 +858,7 @@ void	get_all_positions(t_all *all)
 		line++;
 	}
 }
-// all->play->line
+
 int	main(int argc, char *argv[])
 {
 	t_all 			*all = malloc(sizeof(t_all));
@@ -900,7 +900,7 @@ int	main(int argc, char *argv[])
 	printf("oi2\n");
 	if (!check_elements(s_map, s_play, s_game))
 		return (1);
-	get_element_positions(all);
+	get_all_positions(all);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[0].charr, all->game->element[0].line, all->game->element[0].column);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[1].charr, all->game->element[1].line, all->game->element[1].column);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[2].charr, all->game->element[2].line, all->game->element[2].column);

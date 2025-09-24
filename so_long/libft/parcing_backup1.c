@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parcing.c                                          :+:      :+:    :+:   */
+/*   parcing_backup1.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 00:32:16 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/24 01:18:50 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/23 23:55:43 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,50 +65,27 @@ int	check_close_walls(t_mapinfo *s_map)
 	return (1);
 }
 
-// void create_elements(t_gameinfo *s_game)
-// {
-// 	char	*elements;
-// 	int		*count_elements;
-// 	int		index;
-// 	char	*string;
-
-// 	index = 0;
-// 	string = "PEC10RXITO";
-// 	elements = malloc(11 * sizeof(char));
-// 	count_elements = malloc(11 * (sizeof(int)));
-// 	if (!elements || !count_elements)
-// 		return ;
-// 	while (index < 11)
-// 	{
-// 		elements[index] = string[index];
-// 		count_elements[index] = 0;
-// 		index++;
-// 	}
-// 	s_game->elements = elements;
-// 	s_game->count_elements = count_elements;
-// }
-
 void create_elements(t_gameinfo *s_game)
 {
-	t_element	*elements;
-	// int		*count_elements;
+	char	*elements;
+	int		*count_elements;
 	int		index;
 	char	*string;
 
 	index = 0;
 	string = "PEC10RXITO";
-	elements = malloc(11 * sizeof(t_element));
-	if (!elements)
+	elements = malloc(11 * sizeof(char));
+	count_elements = malloc(11 * (sizeof(int)));
+	if (!elements || !count_elements)
 		return ;
 	while (index < 11)
 	{
-		elements[index].charr = string[index];
-		elements[index].count = 0;
-		elements[index].line = 0;
-		elements[index].column = 0;
+		elements[index] = string[index];
+		count_elements[index] = 0;
 		index++;
 	}
-	s_game->element = elements;
+	s_game->elements = elements;
+	s_game->count_elements = count_elements;
 }
 
 void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
@@ -125,45 +102,17 @@ void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 		{
 			if (s_map->map[line][column] == 'P')
 				*s_play = (t_playerinfo){line, column, 0, 0, 0, {0}, line * 64, column * 64, 0, 0, '\0', '\0', '\0', '\0'};
-			
 			if (s_map->map[line][column] == 'E')
 			{
 				s_game->e_line = line;
 				s_game->e_column = column;				
 			}
 			index = 0;
-			while ((s_map->map[line][column] != s_game->element[index].charr) 
-				&& (s_game->element[index].charr != 'O'))
-				index++;				
-			s_game->element[index].count++;
+			while ((s_map->map[line][column] != s_game->elements[index]) 
+				&& (s_game->elements[index] != 'O'))
+				index++;
+			s_game->count_elements[index]++;
 		}
-	}
-}
-
-void	get_element_positions(t_all *all)
-{
-	int	line;
-	int	column;
-	int	index;
-
-	line = 0;
-	while (all->map->map[line] != NULL)
-	{
-		column = 0;
-		while ((all->map->map[line][column] != '\n') && (all->map->map[line][column] != '\0'))
-		{
-			index = 0;
-			// write(1, "AQUI 1\n", 7);
-			while ((all->game->element[index].charr != all->map->map[line][column]) && (all->game->element[index].charr != 'O'))
-			{
-				// write(1, "AQUI 2\n", 7);
-				index++;				
-			}
-			all->game->element[index].line = line;
-			all->game->element[index].column = column;
-			column++;
-		}
-		line++;
 	}
 }
 
@@ -175,7 +124,6 @@ int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 	printf("\nNao Criou elementos\n");
 	create_elements(s_game);
 	printf("\nCriou elementos\n");
-	printf("Char da struct-> %c\nCount da struct-> %d\n\n", s_game->element[0].charr, s_game->element[0].count);
 	count_elements(s_map, s_play, s_game);
 	printf("\nContou os elementos\n");
 	int	i;
@@ -183,17 +131,17 @@ int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 	i = 0;
 	while (i < 6)
 	{
-		printf("\nelement %c: %d\n", s_game->element[i].charr, s_game->element[i].count);
+		printf("\nelement %c: %d\n", s_game->elements[i], s_game->count_elements[i]);
 		i++;
 	}
-	while(s_game->element[index].charr != '\0')
+	while(s_game->elements[index] != '\0')
 	{
-		if ((s_game->element[index].charr == 'P' || s_game->element[index].charr == 'E') 
-			&& s_game->element[index].count > 1)
+		if ((s_game->elements[index] == 'P' || s_game->elements[index] == 'E') 
+			&& s_game->count_elements[index] > 1)
 			return (0);
-		if (s_game->element[index].charr == 'C' && s_game->element[index].count < 1)
+		if (s_game->elements[index] == 'C' && s_game->count_elements[index] < 1)
 			return (0);
-		if (s_game->element[index].charr == 'O' && s_game->element[index].count > 0)
+		if (s_game->elements[index] == 'O' && s_game->count_elements[index] > 0)
 			return (0);
 		index++;
 	}
@@ -232,7 +180,7 @@ int	check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 	int	path;
 	int	to_colect[2];
 
-	to_colect[0] = s_game->element[2].count;
+	to_colect[0] = s_game->count_elements[2];
 	to_colect[1] = 1;
 	line = s_play->line;
 	column = s_play->column;

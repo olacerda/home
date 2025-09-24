@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_backup8.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/24 01:35:26 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/23 22:42:01 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ t_image	*image_initiator(void *mlx, int wide, int tall)
 {
 	t_image *image;
 
-	image = malloc(sizeof(t_image));
+	image = malloc(sizeof(t_image *));
 	if (!image)
 		return (NULL);
 	image->tall = tall;
@@ -214,8 +214,8 @@ void	update_background(t_sheet *src, t_image *dst, t_image *background, int spri
 	
 	// int teste = 0;
 	// int fundo = ((int *)src->img)[0];
-	int bg_line = difference_column;
-	int bg_column = difference_line;
+	int bg_line = 0;
+	int bg_column = 0;
 
 	// printf("\nINT DO FUNDO: ---------> %d\n", fundo);
 	
@@ -333,7 +333,7 @@ t_all_images	*all_images_initiator(void *mlx)
 	sheet_to_image_convertor(images->grass_wall_sheet, images->grass, NULL, 2, 1);
 	sheet_to_image_convertor(images->letters_sheet, images->player, images->grass, 1, 6);
 	color_image(images->collectable, 501000);
-	color_image(images->exit, 0);
+	color_image(images->exit, 16777215);
 	sheet_to_image_convertor(images->letters_sheet, images->R, images->grass, 5, 3);
 	sheet_to_image_convertor(images->letters_sheet, images->X, images->grass, 4, 7);
 	sheet_to_image_convertor(images->letters_sheet, images->I, images->grass, 4, 4);
@@ -358,7 +358,7 @@ void	put_images(void *mlx, t_mapinfo *map, void *window, t_all_images *images)
 		while(map->map[line][index] != '\n' && (index < map->line_len))
 		{
 			if (map->map[line][index] == '0' || map->map[line][index] == 'E')
-				mlx_put_image_to_window(mlx, window, images->exit->mlx_st, index * 64, line * 64);
+				mlx_put_image_to_window(mlx, window, images->grass->mlx_st, index * 64, line * 64);
 			if (map->map[line][index] == '1')
 				mlx_put_image_to_window(mlx, window, images->wall->mlx_st, index * 64, line * 64);
 			if (map->map[line][index] == 'P')
@@ -413,8 +413,8 @@ int	check_letters_colected(t_all *all)
 	while (index < 4)
 	{
 		printf("%c", all->play->letter_colected[index]);
-		// printf("%c", all->game->element[index + 5].charr);
-		if ((all->play->letter_colected[index] != all->game->element[index + 5].charr))
+		// printf("%c", all->game->elements[index + 5]);
+		if ((all->play->letter_colected[index] != all->game->elements[index + 5]))
 			return (0);
 		// printf("passou do return\n");
 		index++;
@@ -483,13 +483,14 @@ int	check_player_range(t_all *all, char element)
 	}
 	return (0);
 }
+
 void	update_game(t_all *all)
 {
 	if ((check_player_range(all, 'C') == 1) && (all->states->full_colectables == 0))
 	{
 		write(1, "\a", 1);
 		all->play->colected++;
-		if (all->play->colected >= all->game->element[2].charr)
+		if (all->play->colected >= all->game->count_elements[2])
 			all->states->full_colectables = 1;
 		// all->map->map[all->play->line][all->play->column] = '0';
 	}
@@ -632,7 +633,7 @@ int	callback(int code, void *arg)
 	t_all *all = (t_all *)arg;
 	// static int	previous_pixel_column;
 	// static int	previous_pixel_line;
-	int speed = 2;
+	int speed = 1;
 
 	all->play->p_pixel_column = all->play->pixel_column;
 	all->play->p_pixel_line = all->play->pixel_line;
@@ -787,16 +788,16 @@ int game_loop(void *arg)
 
     all = (t_all *)arg;
 	if (all->states->full_colectables == 1 && all->states->right_letters == 1)
-		make_sound(500000);
+		make_sound(50000);
 	if (all->states->key_a != 0 || all->states->key_w != 0 || all->states->key_s != 0 || all->states->key_d != 0)
 	{
 		callback(1, all);
+		usleep(1000);
+		// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
 		update_background(all->images->letters_sheet, all->images->player, all->images->grass, 1, 6, all->play);
-		// mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
-		mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
-		mlx_do_sync(all->mlx);
-		usleep(10000);
 	}
+	mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->play->pixel_column, all->play->pixel_line);
+	mlx_do_sync(all->mlx);
     return (0);
 }
 
@@ -832,33 +833,7 @@ int	check_map_size(t_all *all)
 	return (1);
 }
 
-void	get_all_positions(t_all *all)
-{
-	int	line;
-	int	column;
-	int	index;
 
-	line = 0;
-	while (all->map->map[line] != NULL)
-	{
-		column = 0;
-		while ((all->map->map[line][column] != '\n') && (all->map->map[line][column] != '\0'))
-		{
-			index = 0;
-			// write(1, "AQUI 1\n", 7);
-			while ((all->game->element[index].charr != all->map->map[line][column]) && (all->game->element[index].charr != 'O'))
-			{
-				// write(1, "AQUI 2\n", 7);
-				index++;				
-			}
-			all->game->element[index].line = line;
-			all->game->element[index].column = column;
-			column++;
-		}
-		line++;
-	}
-}
-// all->play->line
 int	main(int argc, char *argv[])
 {
 	t_all 			*all = malloc(sizeof(t_all));
@@ -896,22 +871,8 @@ int	main(int argc, char *argv[])
 		return (1);
 	if (!check_close_walls(s_map))
 		return (1);
-	printf("oi\n");
-	printf("oi2\n");
 	if (!check_elements(s_map, s_play, s_game))
 		return (1);
-	get_element_positions(all);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[0].charr, all->game->element[0].line, all->game->element[0].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[1].charr, all->game->element[1].line, all->game->element[1].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[2].charr, all->game->element[2].line, all->game->element[2].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[3].charr, all->game->element[3].line, all->game->element[3].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[4].charr, all->game->element[4].line, all->game->element[4].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[5].charr, all->game->element[5].line, all->game->element[5].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[6].charr, all->game->element[6].line, all->game->element[6].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[7].charr, all->game->element[7].line, all->game->element[7].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[8].charr, all->game->element[8].line, all->game->element[8].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[9].charr, all->game->element[9].line, all->game->element[9].column);
-	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[10].charr, all->game->element[10].line, all->game->element[10].column);
 	if (!check_all_paths(s_map, s_play, s_game))
 		return (1);
 	if (!check_map_size(all))
