@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_backup11.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/25 05:13:25 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/24 23:40:29 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,65 +65,43 @@ char	*get_map_adress(char *chosen_map)
 	return (adress);
 }
 
-char	*copy_string(char *string)
-{
-	int	size;
-	int	index;
-	char *result;
-
-	size = 0;
-	index = 0;
-	while (string[size])
-		size++;
-	result = malloc((size + 1) * sizeof(char));
-	if (!result)
-		return (NULL);
-	while (string[index])
-	{
-		result[index] = string[index];
-		index++;
-	}
-	result[index] = '\0';
-	return (result);
-}
-
 char **create_map(t_mapinfo *s_map)
 {
 	char	**map;
 	int		line;
 	int		fd;
-	int		index;
-	char	*string;
 
+	// printf("\nentrou no create_map\n");
 	fd = open(s_map->map_adress, O_RDONLY);
 	if (fd < 0)
 		return (NULL);
+	// printf("\n LINES %d\n", s_map->total_lines);
 	map = malloc ((s_map->total_lines + 1) * sizeof(char *));
 	if (!map)
-		return (close(fd), NULL);
-	line = -1;
-	while(++line < s_map->total_lines)
 	{
-		string = getnextline(fd);
-		index = -1;
-		map[line] = copy_string(string);
-		free(string);
+		close(fd);
+		return (NULL);
 	}
+	line = 0;
+	while(line < s_map->total_lines)
+		map[line++] = getnextline(fd);
 	map[line] = NULL;
-	return (close(fd), map);
+	close(fd);
+	printf("FUNCIONOU ATE AQUI");
+	return (map);
 }
 
-void	free_map(char **map)
+void	free_map(t_mapinfo *map)
 {
 	int	line;
 
 	line = 0;
-	while (map[line] != NULL)
+	while (map->map[line] != NULL)
 	{
-		free(map[line]);
+		free(map->map[line]);
 		line++;	
 	}
-	free(map);
+	free(map->map);
 }
 
 void	so_long(t_mapinfo *s_map)
@@ -472,7 +450,7 @@ int	check_letters_colected(t_all *all)
 void	update_player_range(t_all *all)
 {
 	printf("Entrou no update_player_range ---------->>\n");
-	all->play->tl_range = all->map->map[(all->game->element[indexor('P')].px_line + 12) / 64][(all->game->element[indexor('P')].px_column + 12) / 64];
+	all->play->tl_range = all->map->map[(all->game->element[indexor('P')].px_line + 12) /64][(all->game->element[indexor('P')].px_column + 12) / 64];
 	all->play->tr_range = all->map->map[(all->game->element[indexor('P')].px_line + 12) / 64][(all->game->element[indexor('P')].px_column + 50) / 64];
 	all->play->bl_range = all->map->map[(all->game->element[indexor('P')].px_line + 50) / 64][(all->game->element[indexor('P')].px_column + 12) / 64];
 	all->play->br_range = all->map->map[(all->game->element[indexor('P')].px_line + 50) / 64][(all->game->element[indexor('P')].px_column + 50) / 64];
@@ -487,16 +465,12 @@ void	update_range_image(t_all *all, int	line, int column)
 	printf("entrou no update_range_image----------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
 	grid_pixel_line = line * 64;
 	grid_pixel_column = column * 64;
-	printf("\n\n\n\n\nUPDATE DO COLETAVEL: AQUI     AQUI     AQUI    AQUI    AQUI     AQUI     AQUI    AQUI    AQUI     AQUI     AQUI    AQUI    AQUI     AQUI     AQUI    AQUI     %c\n\n\n\n\n", all->map->map[line][column]);
 	all->map->map[line][column] = '0';
-	printf("\n\n\n\n\nUPDATE DO COLETAVEL: AQUI     AQUI     AQUI    AQUI    AQUI     AQUI     AQUI    AQUI    AQUI     AQUI     AQUI    AQUI    AQUI     AQUI     AQUI    AQUI     %c\n\n\n\n\n", all->map->map[line][column]);
 	printf("Passou do map[location] = '0'\n\n");
 	mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, grid_pixel_column, grid_pixel_line);
-	update_player_range(all);
 }
 
-
-int	check_player_range2(t_all *all, char element)
+int	check_player_range(t_all *all, char element)
 {
 	printf("entrou no CHECK_PLAYER_RANGE----------->>>>>>>>>>>>>>>>>\n\n");
 	if (all->play->tl_range == element)
@@ -521,104 +495,31 @@ int	check_player_range2(t_all *all, char element)
 	}
 	return (0);
 }
-
-int	check_player_range(t_all *all, char element)
-{
-	printf("entrou no CHECK_PLAYER_RANGE----------->>>>>>>>>>>>>>>>>\n\n");
-	if (((all->play->tl_range != element) && (all->play->tl_range != '1')))
-	{
-		// update_range_image(all, (all->game->element[indexor('P')].px_line / 64), (all->game->element[indexor('P')].px_column / 64));
-		return (1);
-	}
-	if ((all->play->tr_range != element) && (all->play->tr_range != '1'))
-	{
-		// update_range_image(all, (all->game->element[indexor('P')].px_line / 64), ((all->game->element[indexor('P')].px_column + 63) / 64));
-		return (1);
-	}
-	if ((all->play->bl_range != element) && (all->play->bl_range != '1'))
-	{
-		// update_range_image(all, ((all->game->element[indexor('P')].px_line + 63) / 64), (all->game->element[indexor('P')].px_column / 64));
-		return (1);
-	}
-	if ((all->play->br_range != element) && (all->play->br_range != '1'))
-	{
-		// update_range_image(all, ((all->game->element[indexor('P')].px_line + 63) / 64), ((all->game->element[indexor('P')].px_column + 63) / 64));
-		return (1);
-	}
-	return (0);
-}
 void	update_game(t_all *all)
 {
-	if (check_player_range(all, '0') == 1)
+	if ((check_player_range(all, 'C') == 1) && (all->states->full_colectables == 0))
 	{
-		if ((check_player_range2(all, 'C') == 1) && (all->states->full_colectables == 0))
-		{
-			write(1, "\a", 1);
-			all->play->colected++;
-			if (all->play->colected >= all->game->element[2].charr)
-				all->states->full_colectables = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';
-		}
-		else if ((check_player_range2(all, 'R') == 1) && all->play->R == 0)
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			if (check_letters_colected(all) == 1)
-				all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';	
-			all->play->R = 1;
-			usleep(1000);
-		}
-		else if ((check_player_range2(all, 'X') == 1) && all->play->X == 0)
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			if (check_letters_colected(all) == 1)
-				all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';
-			all->play->X = 1;
-			usleep(1000);				
-		}
-		else if ((check_player_range2(all, 'I') == 1) && all->play->I == 0)
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			if (check_letters_colected(all) == 1)
-				all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';	
-			all->play->I = 1;
-			usleep(1000);				
-		}
-		else if ((check_player_range2(all, 'T') == 1) && all->play->T == 0)
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			if (check_letters_colected(all) == 1)
-				all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';	
-			all->play->T = 1;
-			usleep(1000);				
-		}
+		write(1, "\a", 1);
+		all->play->colected++;
+		if (all->play->colected >= all->game->element[2].charr)
+			all->states->full_colectables = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';
+	}
+	if ((check_player_range(all, 'R') == 1) || 
+		(check_player_range(all, 'X') == 1) || 
+		(check_player_range(all, 'I') == 1) || 
+		(check_player_range(all, 'T') == 1))
+	{
+		write(1, "\a", 1);
+		// static int flag = 1;
+		// if (flag == 1)
+		// {
+		// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
+		// 	flag = 0;
+		// }
+		if (check_letters_colected(all) == 1)
+			all->states->right_letters = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';		
 	}
 	printf("\nCOLECTED: %d\n", all->play->colected);
 	printf("Letter State: %d\nCoin State: %d\n\n", all->states->right_letters, all->states->full_colectables);
@@ -749,7 +650,7 @@ int	callback(int code, void *arg)
 	t_all *all = (t_all *)arg;
 	// static int	previous_pixel_column;
 	// static int	previous_pixel_line;
-	int speed = 2;
+	int speed = 1;
 
 	all->play->p_pixel_column = all->game->element[indexor('P')].px_column;
 	all->play->p_pixel_line = all->game->element[indexor('P')].px_line;
@@ -898,7 +799,6 @@ int	check_key_released(int code, void *arg)
 // 	}
 // }
 //------------------------------------------------------------------------------------------>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 int game_loop(void *arg)
 {
     t_all *all;
@@ -906,15 +806,6 @@ int game_loop(void *arg)
     all = (t_all *)arg;
 	if (all->states->full_colectables == 1 && all->states->right_letters == 1)
 		make_sound(500000);
-	
-	// if (all->play->letter_colected[0] != 0)
-	// {
-	// 	mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, all->game->element[indexor('R')].px_column, all->game->element[indexor('R')].px_line);
-	// 	all->game->element[indexor('R')].px_column += 2;
-	// 	mlx_put_image_to_window(all->mlx, all->window, all->images->R->mlx_st, all->game->element[indexor('R')].px_column, all->game->element[indexor('R')].px_line);
-	// 	usleep(10000);
-	// }
-		
 	if (all->states->key_a != 0 || all->states->key_w != 0 || all->states->key_s != 0 || all->states->key_d != 0)
 	{
 		callback(1, all);
@@ -922,7 +813,7 @@ int game_loop(void *arg)
 		// mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
 		mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor('P')].px_column, all->game->element[indexor('P')].px_line);
 		mlx_do_sync(all->mlx);
-		usleep(19000);
+		usleep(10000);
 	}
     return (0);
 }
@@ -998,7 +889,7 @@ int	main(int argc, char *argv[])
 	if (argc != 2)
 		return (1);
 	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
-	*s_play = (t_playerinfo){0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
+	*s_play = (t_playerinfo){0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0'};
 	*s_game = (t_gameinfo){0, 0, 0, 0, 0};
 	*states = (t_states){0, 0, 0, 0, 0, 0};
 	all->map = s_map;
@@ -1014,7 +905,6 @@ int	main(int argc, char *argv[])
 	s_map->total_lines = count_lines(s_map->map_adress);
 	if (!s_map->total_lines)
 		return (1);
-	// write(1, "teste\n", 6);
 	s_map->map = create_map(s_map);
 	if (!(s_map->map))
 		return (1);
@@ -1024,7 +914,9 @@ int	main(int argc, char *argv[])
 		return (1);
 	if (!check_close_walls(s_map))
 		return (1);
-	if (!(check_elements(s_map, s_play, s_game)))
+	printf("oi\n");
+	printf("oi2\n");
+	if (!(printf("check elements NUMBER: %d\n", check_elements(s_map, s_play, s_game))))
 		return (1);
 	// get_element_positions(s_game, s_map);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[0].charr, all->game->element[0].line, all->game->element[0].column);
@@ -1038,16 +930,16 @@ int	main(int argc, char *argv[])
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[8].charr, all->game->element[8].line, all->game->element[8].column);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[9].charr, all->game->element[9].line, all->game->element[9].column);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[10].charr, all->game->element[10].line, all->game->element[10].column);
-	printf("EU AQUI------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	if (!check_all_paths(s_map, s_play, s_game))
 		return (1);
+	// printf("EU AQUI------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	write(1, "teste123", 5);
 	if (!check_map_size(all))
 		return (1);
 	game_initializer(s_map, all);
 	free(s_map);
 }
-//e_linefree_m
+//e_line
 
 // compilar com
 // cc -Wall -Wextra -Werror -I libft -I MiniLibX/minilibx-linux so_long.c libft/parcing.c libft/utils.c libft/getnextline.c -L MiniLibX/minilibx-linux -lmlx -lXext -lX11 -lm

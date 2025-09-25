@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 21:54:15 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/24 01:13:01 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/25 04:00:12 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,6 @@
 # define SO_LONG_H
 
 typedef struct timeval t_time;
-
-typedef struct s_element
-{
-	char	charr;
-	int		count;
-	int		line;
-	int		column;
-} t_element;
 
 typedef struct s_states
 {
@@ -32,6 +24,16 @@ typedef struct s_states
 	int	key_s;
 	int	key_d;
 } t_states;
+
+typedef struct s_element
+{
+	char	charr;
+	int		count;
+	int		line;
+	int		column;
+	int		px_line;
+	int		px_column;
+} t_element;
 
 typedef struct s_gameinfo
 {
@@ -59,6 +61,10 @@ typedef struct s_playerinfo
 	char	tr_range;
 	char	bl_range;
 	char	br_range;
+	int	R;
+	int	X;
+	int	I;
+	int	T;
 }	t_playerinfo;
 
 typedef struct s_mapinfo
@@ -135,7 +141,7 @@ void 			so_long(t_mapinfo *s_map);
 char			*get_map_adress(char *chosen_map);
 int				count_lines(char *chosen_map);
 char 			**create_map(t_mapinfo *s_map);
-void			free_map(t_mapinfo *game);
+void			free_map(char **game);
 
 t_sheet 		*sheet_initiator(void *mlx, int sprite_number);
 t_image			*image_initiator(void *mlx, int wide, int tall);
@@ -160,6 +166,9 @@ int				check_key_released(int code, void *arg);
 void			update_player_range(t_all *all);
 void			update_range_image(t_all *all, int	line, int column);
 int				check_player_range(t_all *all, char element);
-void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_playerinfo *play);
+void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_gameinfo *game);
+int				indexor(char x);
+int				check_player_range2(t_all *all, char element);
+
 
 #endif

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   salvador.c                                         :+:      :+:    :+:   */
+/*   so_long_backup.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/22 03:46:12 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/25 03:59:26 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,8 @@ char	*get_map_adress(char *chosen_map)
 	return (adress);
 }
 
+
+
 char **create_map(t_mapinfo *s_map)
 {
 	char	**map;
@@ -75,7 +77,8 @@ char **create_map(t_mapinfo *s_map)
 	fd = open(s_map->map_adress, O_RDONLY);
 	if (fd < 0)
 		return (NULL);
-	write(1, "passou", 6);
+	write(1, "PASSOU OU NAO PASSOU? ----------------------->>>>>>>>>>>>>>", 59);
+	write(1, "passou?", 7);
 	// printf("\n LINES %d\n", s_map->total_lines);
 	map = malloc ((s_map->total_lines + 1) * sizeof(char *));
 	if (!map)
@@ -91,17 +94,17 @@ char **create_map(t_mapinfo *s_map)
 	return (map);
 }
 
-void	free_map(t_mapinfo *map)
+void	free_map(char **map)
 {
 	int	line;
 
 	line = 0;
-	while (map->map[line] != NULL)
+	while (map[line] != NULL)
 	{
-		free(map->map[line]);
+		free(map[line]);
 		line++;	
 	}
-	free(map->map);
+	free(map);
 }
 
 void	so_long(t_mapinfo *s_map)
