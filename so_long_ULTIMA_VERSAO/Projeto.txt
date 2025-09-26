@@ -1,0 +1,33 @@
+Nível 1
+Cabeça de pudim.
+Apenas escrever "exit"
+Dificuldade: -Colocar '\0' no final.
+
+Nível 2
+Macaco
+escrever "exit" fazendo malloc primeiro
+Dificuldade: -Fazer o malloc do tamanho certo: 5, mallocs menores com overflow gerarão UB perseguidor até dar free.
+
+Nível 3
+Neardental.		
+escrever "exit" fazendo malloc, e dar free antes de saír
+Dificuldade: Lembrar de dar free, e evitar double free (inimigo perseguirá até virar NULL).
+
+Nível 4
+Homo sapien, com óculos de grau, meio nerd e curvado (coleira bramca, pisciner)
+escrever "exit" fazendo malloc, dando free, e escolhendo os tipos corretos pra cada variável.
+Dificuldade: 
+
+
+Nível 5
+Homo sapien, com óculos de grau, meio nerd e curvado (coleira bramca, pisciner)
+escrever exit fazendo punning
+dificuldade: fugir do undefined behavior que irá te perseguir
+
+
+Nível 6
+Homo sapien coleira laranja, ereto, de óculos escuro e confiante
+escrever exit fazendo punning, e administrando "padding";
+dificuldade: fugir do undefined behavior que irá te perseguir
+
+Qndo surge um undefined behavior na tela, ele "embaralha" suas teclas de movimentação
