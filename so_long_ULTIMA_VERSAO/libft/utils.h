@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   utils.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:09:23 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/25 06:42:12 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/26 23:25:07 by olacerda         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef UTILS_H
 # define UTILS_H
@@ -51,7 +51,7 @@ int		path_to_colectable(char **map, int	line, int column, char	*to_colect, int *
 int		letters_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *elements);
 int		exit_colectables_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *elements);
 int		path_to_letters(char **map, int	line, int column, char	*to_colect, int *count);
-void	copy_map(t_mapinfo *map, char **copy, char ignore);
+void	copy_map(t_mapinfo *map, char **copy, char *ignore);
 
 
 

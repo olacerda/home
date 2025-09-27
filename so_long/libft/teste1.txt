@@ -1,4 +1,0 @@
-fd1 linha 1
-
-fd1 linha 3
-fd1 linha 4

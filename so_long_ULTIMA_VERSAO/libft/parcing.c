@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parcing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 00:32:16 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/26 06:41:09 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/27 03:59:13 by olacerda         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "utils.h"
 
@@ -220,21 +220,27 @@ int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 	return (1);
 }
 
-void	copy_map(t_mapinfo *map, char **copy, char ignore)
+void	copy_map(t_mapinfo *map, char **copy, char *ignore)
 {
 	int	line;
 	int	index;
+	int	idx_ignore;
 
 	line = 0;
+	printf("Copiou o mapa, colocando '0' no lugar de: %s\n\n", ignore);
 	while (map->map[line] != NULL)
 	{
 		index = 0;
 		while (map->map[line][index] != '\0')
 		{
-			if (map->map[line][index] != ignore)
-				copy[line][index] = map->map[line][index];
-			else
-				copy[line][index] = '0';
+			idx_ignore = -1;
+			while (ignore[++idx_ignore])
+			{
+				if (map->map[line][index] != ignore[idx_ignore])
+					copy[line][index] = map->map[line][index];
+				else
+					copy[line][index] = '0';	
+			}
 			index++;
 		}
 		copy[line][index] = '\0';
@@ -242,34 +248,11 @@ void	copy_map(t_mapinfo *map, char **copy, char ignore)
 		// printf("dentro de ORIGINAL: %s", map->map[line]);
 		line++;
 	}
+	line = -1;
+	while (copy[++line] != NULL)
+		printf("Copy map -> %s\n", copy[line]);
 	// map->map[line] = NULL;
 }
-
-// int	path_to_colectable(char **map, int	line, int column, char	*to_colect, int *count)
-// {
-// 	if (((column == 0) || line == 0 || map[line] == NULL || 
-// 		map[line][column] == '\n' || map[line][column] == '\0') || 
-// 		((map[line][column] != '0') && (map[line][column] != *to_colect)))
-// 		return (0);
-// 	if (map[line][column] == *to_colect)
-// 	{
-// 		(*count)--;
-// 		printf("Coletavel: %c  Quantidade faltando: %d\n", *to_colect, *count);
-// 	}
-// 	if (*count == 0)
-// 		return (1);
-// 	map[line][column] = '7';
-// 	if(path_to_colectable(map, line + 1, column, to_colect, count) == 1)
-// 		return (1);
-// 	if(path_to_colectable(map, line, column + 1, to_colect, count) == 1)
-// 		return (1);
-// 	if(path_to_colectable(map, line - 1, column, to_colect, count) == 1)
-// 		return (1);
-// 	if(path_to_colectable(map, line, column - 1, to_colect, count) == 1)
-// 		return (1);
-// 	return (0);
-// }
-
 
 int	path_to_colectable(char **map, int	line, int column, char	*to_colect, int *count)
 {
@@ -303,11 +286,14 @@ int	exit_colectables_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char
 	int	path;
 	int	index;
 	index = 0;
-	char	teste = s_game->element[indexor(&(elements[index]))].charr;
+	char	target = s_game->element[indexor(&(elements[index]))].charr;
 	int	count = s_game->element[indexor(&(elements[index]))].count;
+	static	char ignore[3] = {0, 0, '\0'};
 	// int	line = 0;
 
+	// ignore [2] = '\0';
 	path = 0;
+	printf("\nExit and Colectables Path----------------------------->>>>>>>>>>\n\n");
 	while (elements[index] != '\0')
 	{
 		// write(1, "\n\n\n", 3);
@@ -324,11 +310,12 @@ int	exit_colectables_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char
 		// 	line++;
 		// }
 		// write(1, "\n\n\n", 3);
-		teste = s_game->element[indexor(&(elements[index]))].charr;
+		target = s_game->element[indexor(&(elements[index]))].charr;
+		ignore[index] = target;
 		count = s_game->element[indexor(&(elements[index]))].count;
-		path = path_to_colectable(map, s_game->element[indexor("P")].line, s_game->element[indexor("P")].column, &teste, &count);
-		printf("\nPath do char:%c  Quantidade: %d ->> %d\n", s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
-		copy_map(s_map, map, teste);
+		path = path_to_colectable(map, s_game->element[indexor("P")].line, s_game->element[indexor("P")].column, &target, &count);
+		printf("Path do char:%c  Quantidade: %d ->> %d\n\n", s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
+		copy_map(s_map, map, ignore);
 		if (!path)
 			return (0);
 		index++;
@@ -341,22 +328,26 @@ int	letters_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *element
 	int	path;
 	int	index;
 	index = 0;
-	char	teste = s_game->element[indexor(&(elements[index]))].charr;
+	char	target = s_game->element[indexor(&(elements[index]))].charr;
 	int	count = s_game->element[indexor(&(elements[index]))].count;
+	static char ignore[6] = {0, 0, 0, 0, 0, '\0'};
 
+	printf("\n\n ------------------------------------>>>>>>>>>>>>Letters path\n");
 	path = 0;
-	path = path_to_colectable(map, s_game->element[indexor("P")].line, s_game->element[indexor("P")].column, &teste, &count);
-	copy_map(s_map, map, teste);	
-	printf("\nPath do char:%c  Quantidade: %d ->> %d\n", s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
-	if (!path)
-		return (0);
-	while (elements[index + 1] != 'T')
+	// path = path_to_colectable(map, s_game->element[indexor("P")].line, s_game->element[indexor("P")].column, &target, &count);
+	// ignore[0] = s_game->element[indexor("P")].charr;
+	// copy_map(s_map, map, ignore);
+	// printf("Path to char:%c to --> %c Quantidade: %d ->> %d\n\n", s_game->element[indexor("P")].charr, s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
+	// if (!path)
+	// 	return (0);
+	while (elements[index] != 'T')
 	{
-		teste = s_game->element[indexor(&(elements[index + 1]))].charr;
+		target = s_game->element[indexor(&(elements[index + 1]))].charr;
+		ignore[index] = target;
 		count = s_game->element[indexor(&(elements[index]))].count;
-		path = path_to_colectable(map, s_game->element[indexor(&(elements[index]))].line, s_game->element[indexor(&(elements[index]))].column, &teste, &count);
-		copy_map(s_map, map, teste);
-		printf("\nPath do char:%c  Quantidade: %d ->> %d\n", s_game->element[indexor(&(elements[index + 1]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
+		path = path_to_colectable(map, s_game->element[indexor(&(elements[index]))].line, s_game->element[indexor(&(elements[index]))].column, &target, &count);
+		copy_map(s_map, map, ignore);
+		printf("Path to char:%c  to ->> %c  Quantidade: %d ->> %d\n\n", s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index + 1]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
 		if (!path)
 			return (0);
 		index++;
@@ -373,11 +364,11 @@ int	check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 	(void)s_play;
 	map = create_map(s_map);
 	path = exit_colectables_path(s_map, s_game, map, "CE");
-	printf("Primeiro path: %d\n", path);
+	printf("***   Primeiro path: %d   ***\n\n\n", path);
 	if (!path)
 		return (0);
-	path = letters_path(s_map, s_game, map, "RXIT");
-	printf("Segundo path: %d\n", path);
+	path = letters_path(s_map, s_game, map, "PRXIT");
+	printf("***   Segundo path: %d   ***\n\n\n\n", path);
 	if (!path)
 		return (0);	
 	free_map(map);

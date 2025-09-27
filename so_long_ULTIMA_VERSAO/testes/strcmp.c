@@ -1,31 +1,28 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   teste.h                                            :+:      :+:    :+:   */
+/*   strcmp.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/12 11:00:15 by olacerda          #+#    #+#             */
-/*   Updated: 2025/09/12 11:03:09 by olacerda         ###   ########.fr       */
+/*   Created: 2025/09/27 10:03:49 by olacerda          #+#    #+#             */
+/*   Updated: 2025/09/27 10:06:15 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#ifndef TESTE_H
-# define TESTE_H
+#include <stdio.h>
 
-# include <stdlib.h>
-# include <unistd.h>
-# include <fcntl.h>
-# include <stdio.h>
-
-# define BUFFER_SIZE 42
-
-typedef struct s_teste
+int	mstrcmp(char *string1, char *string2)
 {
-	char buff[BUFFER_SIZE];
-	int	start;
-	int	end;
-	int readbytes;
-} t_teste;
+	int	index;
 
-#endif
+	index = 0;
+	while(string1[index] && string2[index] && string1[index] == string2[index])
+		index++;
+	return (string1[index] - string2[index]);
+}
+
+int	main(void)
+{
+	printf("%d\n", mstrcmp("oI tudo bem", "oI tudo bem"));
+}

@@ -1,12 +1,12 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long_backup15.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/27 12:16:15 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/27 01:51:37 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -283,10 +283,10 @@ void	update_background(t_sheet *src, t_image *dst, t_image *background, int spri
 		count = 0;
 		while (count < ints_per_line)
 		{
-			bg_line = (difference_column + count);
+			bg_line = (difference_column + count); // % background->wide
 			if (bg_line >= background->wide)
 				bg_line = bg_line - background->wide;
-			bg_column = (difference_line + img_line);
+			bg_column = (difference_line + img_line); // % background->tall
 			if (bg_column >= background->tall)
 				bg_column = bg_column - background->tall;
 			background_index = bg_column * (background->sizeline / 4) + bg_line;
@@ -348,7 +348,6 @@ t_all_images	*all_images_initiator(void *mlx)
 	images->collectable = image_initiator(mlx, 64, 64);
 	images->exit = image_initiator(mlx, 64, 64);
 	images->color = image_initiator(mlx, 64, 64);
-	images->blank_letter = image_initiator(mlx, 300, 30);
 	
 	sheet_to_image_convertor(images->grass_wall_sheet, images->wall, NULL, 1, 1);
 	// color_image(images->grass, 65280);
@@ -356,8 +355,7 @@ t_all_images	*all_images_initiator(void *mlx)
 	sheet_to_image_convertor(images->letters_sheet, images->player, images->grass, 1, 6);
 	color_image(images->collectable, 501000);
 	color_image(images->exit, 0);
-	color_image(images->color, 16711680);
-	color_image(images->blank_letter, 0);
+	color_image(images->color, 0);
 	sheet_to_image_convertor(images->letters_sheet, images->R, images->grass, 5, 3);
 	sheet_to_image_convertor(images->letters_sheet, images->X, images->grass, 4, 7);
 	sheet_to_image_convertor(images->letters_sheet, images->I, images->grass, 4, 4);
@@ -425,62 +423,63 @@ void make_sound(long frequency)
 {
     static	long last = 0;
     long 	now;
-	// static int	a = 3;
-	// int	b;
 
-	// b = 5;
     now = get_full_time();
-	// if (a > 0)
-	// {
-	// 	if (now - last >= 1000000)
-	// 	{
-	// 		// write(1, "\a", 1);
-	// 		// usleep(2000);
-	// 		// write(1, "\a", 1);
-	// 		last = now;
-	// 	}
-	// 	a--;		
-	// }
 	if (now - last >= frequency)
 	{
 		write(1, "\a", 1);
 		last = now;
-		// a = 3;
 	}
 }
 
+// void make_sound(long frequency)
+// {
+// 	static	t_time time;
+//     static	long last = 0;
+//     long 	now;
 
-// Criar uma funcao chamada "event_free", que "limpa" o buffer das letras coletadas, e "zera" o index "positions" de check_letters_colected IMPORTANTE ! ! ! ! ! ! ! ! ! ! ! !
+//     gettimeofday(&time, NULL);
+//     now = (time.tv_sec * 1000000) + time.tv_usec;
+// 	if (now - last >= frequency)
+// 	{
+// 		write(1, "\a", 1);
+// 		last = now;
+// 	}
+// }
 
-void	check_letters_colected(t_all *all, char	element, int line, int column)
+
+int	check_letters_colected(t_all *all)
 {
 	static int	position = 0;
 	int			index;
-	char	*letters;
 
-	letters = "RXIT";
 	index = 0;
-	if (element == 'R' || element == 'X' || element == 'I' || element == 'T')
+	all->play->letter_colected[position] = all->map->map[all->game->element[indexor("P")].line][all->game->element[indexor("P")].column];
+	position++;
+	printf("Letter sheet:  ");
+	while (index < 4)
 	{
-		all->play->letter_colected[position] = all->map->map[line][column];
-		position++;
-		if (position > all->game->memory)
-			all->states->undefined_behavior = 1;
-		printf("Letter sheet:  ");
-		while (index < position)
-		{
-			printf("%c", all->play->letter_colected[index]);
-			// printf("%c", all->game->element[index + 5].charr);
-			if ((all->play->letter_colected[index] != letters[index]))
-				return ;
-			// printf("passou do return\n");
-			index++;
-		}
-		write(1, "\n", 1);
+		printf("%c", all->play->letter_colected[index]);
+		// printf("%c", all->game->element[index + 5].charr);
+		if ((all->play->letter_colected[index] != all->game->element[index + 5].charr))
+			return (0);
+		// printf("passou do return\n");
+		index++;
 	}
-	if (position == 4)
-		all->states->right_letters = 1;	
+	write(1, "\n", 1);
+	return (1);	
 }
+//pixel_line
+// //FUNCIONANDO
+// void	update_player_range(t_all *all)
+// {
+// 	printf("Entrou no update_player_range ---------->>\n");
+// 	all->play->tl_range = all->map->map[all->game->element[indexor("P")].px_line / 64][all->game->element[indexor("P")].px_column / 64];
+// 	all->play->tr_range = all->map->map[all->game->element[indexor("P")].px_line / 64][(all->game->element[indexor("P")].px_column + 63) / 64];
+// 	all->play->bl_range = all->map->map[(all->game->element[indexor("P")].px_line + 63) / 64][all->game->element[indexor("P")].px_column / 64];
+// 	all->play->br_range = all->map->map[(all->game->element[indexor("P")].px_line + 63) / 64][(all->game->element[indexor("P")].px_column + 63) / 64];
+// 	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
+// }
 
 // substituir a adicao pelo numero "48" pra ver se consegue entrar um pouco na imagem antes de coletar ela
 void	update_player_range(t_all *all)
@@ -493,53 +492,49 @@ void	update_player_range(t_all *all)
 	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
 }
 
-void	update_hitbox(t_all *all, int line, int column, char element)
+void	update_range_image(t_all *all, int	line, int column)
 {
 	int	grid_pixel_line;
 	int	grid_pixel_column;
-	printf("entrou no update_hitbox-------->>>>>>>>>>\n\n");
+
+	printf("entrou no update_range_image----------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n\n");
 	grid_pixel_line = line * 64;
 	grid_pixel_column = column * 64;
 	printf("\n\n\n\n\nUPDATE DO COLETAVEL: %c\n\n\n\n\n", all->map->map[line][column]);
-	if (element == 'R' || element == 'X' || element == 'I' || element == 'T')
-		check_letters_colected(all, element, line, column);
-	if (((element != 'Y') && (element != 'E')))
+	if (all->map->map[line][column] != 'Y')
 	{
+		
 		printf("Passou do map[location] = '0'\n\n");
 		all->map->map[line][column] = '0';
-		printf("\n\n\n\n\nUPDATE DO COLETAVEL: %c\n\n\n\n\n", all->map->map[line][column]);
-		mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, grid_pixel_column, grid_pixel_line);	
-		// if (all->map->map[line][column] != 'Y')
 	}
-	// if (all->map->map[line][column] != 'Y')
-	// {
-		
-	// }
-	// update_player_range(all);
+	printf("\n\n\n\n\nUPDATE DO COLETAVEL: %c\n\n\n\n\n", all->map->map[line][column]);
+	if (all->map->map[line][column] != 'Y')
+		mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, grid_pixel_column, grid_pixel_line);
+	update_player_range(all);
 }
 
 
-int	check_hitbox(t_all *all, char element)
+int	check_player_range2(t_all *all, char element)
 {
-	printf("entrou no check_hitbox----------->>>>>>>>>>>>>>>>>\n\n");
-	if (all->map->map[(all->game->element[indexor("P")].px_line + 12) / 64][(all->game->element[indexor("P")].px_column + 12) / 64] == element)
+	printf("entrou no CHECK_PLAYER_RANGE2----------->>>>>>>>>>>>>>>>>\n\n");
+	if (all->play->tl_range == element)
 	{
-		update_hitbox(all, ((all->game->element[indexor("P")].px_line + 12) / 64), ((all->game->element[indexor("P")].px_column + 12) / 64), element);
+		update_range_image(all, (all->game->element[indexor("P")].px_line / 64), (all->game->element[indexor("P")].px_column / 64));
 		return (1);
 	}
-	if (all->map->map[(all->game->element[indexor("P")].px_line + 12) / 64][(all->game->element[indexor("P")].px_column + 50) / 64] == element)
+	if (all->play->tr_range == element)
 	{
-		update_hitbox(all, ((all->game->element[indexor("P")].px_line + 12) / 64), ((all->game->element[indexor("P")].px_column + 50) / 64), element);
+		update_range_image(all, (all->game->element[indexor("P")].px_line / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
 		return (1);
 	}
-	if (all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 12) / 64] == element)
+	if (all->play->bl_range == element)
 	{
-		update_hitbox(all, ((all->game->element[indexor("P")].px_line + 50) / 64), ((all->game->element[indexor("P")].px_column + 12) / 64), element);
+		update_range_image(all, ((all->game->element[indexor("P")].px_line + 63) / 64), (all->game->element[indexor("P")].px_column / 64));
 		return (1);
 	}
-	if (all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 50) / 64] == element)
+	if (all->play->br_range == element)
 	{
-		update_hitbox(all, ((all->game->element[indexor("P")].px_line + 50) / 64), ((all->game->element[indexor("P")].px_column + 50) / 64), element);
+		update_range_image(all, ((all->game->element[indexor("P")].px_line + 63) / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
 		return (1);
 	}
 	return (0);
@@ -547,29 +542,29 @@ int	check_hitbox(t_all *all, char element)
 
 int	check_player_range(t_all *all, char element)
 {
-	printf("entrou no CHECK_PLAYER_RANGE 1------>>>>>>>>\n\n");
+	printf("entrou no CHECK_PLAYER_RANGE 1----------->>>>>>>>>>>>>>>>>\n\n");
 	if (all->play->tl_range != element)
 	{
 		printf("saiu no: tl\n");
-		// update_hitbox(all, (all->game->element[indexor("P")].px_line / 64), (all->game->element[indexor("P")].px_column / 64));
+		// update_range_image(all, (all->game->element[indexor("P")].px_line / 64), (all->game->element[indexor("P")].px_column / 64));
 		return (1);
 	}
 	if (all->play->tr_range != element) 
 	{
 		printf("saiu no: tr\n");
-		// update_hitbox(all, (all->game->element[indexor("P")].px_line / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
+		// update_range_image(all, (all->game->element[indexor("P")].px_line / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
 		return (1);
 	}
 	if (all->play->bl_range != element)
 	{
 		printf("saiu no: bl\n");
-		// update_hitbox(all, ((all->game->element[indexor("P")].px_line + 63) / 64), (all->game->element[indexor("P")].px_column / 64));
+		// update_range_image(all, ((all->game->element[indexor("P")].px_line + 63) / 64), (all->game->element[indexor("P")].px_column / 64));
 		return (1);
 	}
 	if (all->play->br_range != element) 
 	{
 		printf("saiu no: br\n");
-		// update_hitbox(all, ((all->game->element[indexor("P")].px_line + 63) / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
+		// update_range_image(all, ((all->game->element[indexor("P")].px_line + 63) / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
 		return (1);
 	}
 	return (0);
@@ -579,15 +574,15 @@ void	update_game(t_all *all)
 {
 	if (check_player_range(all, '0') == 1)
 	{
-		if ((all->states->full_colectables == 0) && (check_hitbox(all, 'C') == 1))
+		if ((check_player_range2(all, 'C') == 1) && (all->states->full_colectables == 0))
 		{
 			write(1, "\a", 1);
 			all->play->colected++;
-			if (all->play->colected >= all->game->element[indexor("C")].count)
+			if (all->play->colected >= all->game->element[2].charr)
 				all->states->full_colectables = 1;
 			// all->map->map[all->play->line][all->play->column] = '0';
 		}
-		else if  ((all->play->R == 0) && (check_hitbox(all, 'R') == 1))
+		else if ((check_player_range2(all, 'R') == 1) && all->play->R == 0)
 		{
 			write(1, "\a", 1);
 			// static int flag = 1;
@@ -596,22 +591,22 @@ void	update_game(t_all *all)
 			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
 			// 	flag = 0;
 			// }
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
+			if (check_letters_colected(all) == 1)
+				all->states->right_letters = 1;
 			// all->map->map[all->play->line][all->play->column] = '0';	
 			all->play->R = 1;
 		}
-		else if ((all->play->X == 0) && (check_hitbox(all, 'X') == 1))
+		else if ((check_player_range2(all, 'X') == 1) && all->play->X == 0)
 		{
 			write(1, "\a", 1);
 			// static int flag = 1;
 			// all->states->terminal = 1;
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
+			if (check_letters_colected(all) == 1)
+				all->states->right_letters = 1;
 			// all->map->map[all->play->line][all->play->column] = '0';
 			all->play->X = 1;
 		}
-		else if ((all->play->I == 0) && (check_hitbox(all, 'I') == 1))
+		else if ((check_player_range2(all, 'I') == 1) && all->play->I == 0)
 		{
 			write(1, "\a", 1);
 			// static int flag = 1;
@@ -620,12 +615,12 @@ void	update_game(t_all *all)
 			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
 			// 	flag = 0;
 			// }
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
+			if (check_letters_colected(all) == 1)
+				all->states->right_letters = 1;
 			// all->map->map[all->play->line][all->play->column] = '0';	
 			all->play->I = 1;
 		}
-		else if ((all->play->T == 0) && (check_hitbox(all, 'T') == 1))
+		else if ((check_player_range2(all, 'T') == 1) && all->play->T == 0)
 		{
 			write(1, "\a", 1);
 			// static int flag = 1;
@@ -634,39 +629,32 @@ void	update_game(t_all *all)
 			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
 			// 	flag = 0;
 			// }
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
+			if (check_letters_colected(all) == 1)
+				all->states->right_letters = 1;
 			// all->map->map[all->play->line][all->play->column] = '0';	
 			all->play->T = 1;
 		}
-		if ((check_hitbox(all, 'Y') == 1))
+		if ((check_player_range2(all, 'Y') == 1))
 		{
 			if (all->states->key_enter == 1)
 				all->states->terminal = 1;
 			printf("Y state: 1     Terminal state: %d\n\n", all->states->terminal);
 		}
-		if ((check_hitbox(all, 'E') == 1) && (all->states->won == 1))
-		{
-			all->states->full_colectables = 0;
-			mlx_clear_window(all->mlx, all->window);
-			mlx_destroy_window(all->mlx, all->window);
-			exit (0);
-		}
 	}
 	printf("\nCOLECTED: %d\n", all->play->colected);
 	// printf("Letter State: %d\nCoin State: %d\n\n", all->states->right_letters, all->states->full_colectables);
-	printf("Todos coletaveis: %d\n\nLetras corretas: %d\n\nUndefined behavior: %d\n\n", all->states->full_colectables, all->states->right_letters, all->states->undefined_behavior);
-	if (all->states->full_colectables == 1 && all->states->right_letters == 1 && all->states->won == 0)
+	printf("Todos coletaveis: %d\n\nLetras corretas: %d\n\n", all->states->full_colectables, all->states->right_letters);
+	if (all->states->full_colectables == 1 && all->states->right_letters == 1)
 	{
-		all->states->won = 1;
 		mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->game->element[indexor("E")].column * 64, all->game->element[indexor("E")].line * 64);	
 	}
-	// if (all->states->won == 1 && all->map->map[all->game->element[indexor("P")].column][all->game->element[indexor("P")].line] == 'E')
-	// {
-	// 	mlx_clear_window(all->mlx, all->window);
-	// 	mlx_destroy_window(all->mlx, all->window);
-	// 	exit (0);
-	// }
+	if (all->states->full_colectables == 1 && all->states->right_letters == 1 && all->map->map[all->game->element[indexor("P")].column][all->game->element[indexor("P")].line] == 'E')
+	{
+		all->states->full_colectables = 0;
+		mlx_clear_window(all->mlx, all->window);
+		mlx_destroy_window(all->mlx, all->window);
+		exit (0);
+	}
 	mlx_do_sync(all->mlx);
 }
 
@@ -678,8 +666,6 @@ int	callback(int code, void *arg)
 	// static int	previous_pixel_line;
 	int speed = all->game->speed;
 
-	if (all->states->undefined_behavior == 1)
-		speed = -speed;
 	all->play->p_pixel_column = all->game->element[indexor("P")].px_column;
 	all->play->p_pixel_line = all->game->element[indexor("P")].px_line;
 	(void)code;
@@ -689,21 +675,18 @@ int	callback(int code, void *arg)
 	// putnumber(steps);
 	// write(1, "\n", 1);
 // -------------------------------
-	int	yes = 63 * (speed > 0);
-	int	no = 63 * (speed < 0);
 	
-
 	if (all->states->terminal != 1)
 	{
 	// while (code == 100)
 	// {
-		if ((all->states->key_d == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + yes) / 64][(all->game->element[indexor("P")].px_column + yes + speed) / 64] != '1') 
-			&& (all->map->map[(all->game->element[indexor("P")].px_line + no) / 64][(all->game->element[indexor("P")].px_column + yes + speed) / 64] != '1'))
+		if ((all->states->key_d == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + 63) / 64][(all->game->element[indexor("P")].px_column + 63 + speed) / 64] != '1') 
+			&& (all->map->map[all->game->element[indexor("P")].px_line / 64][(all->game->element[indexor("P")].px_column + 63 + speed) / 64] != '1'))
 			// (code == 100 && all->map->map[(all->game->element[indexor("P")].px_line + 64) / 64][(all->game->element[indexor("P")].px_column + 64 + 10 - 1) / 64] != '1'))
 			all->game->element[indexor("P")].px_column += speed;
-		// else if ((all->states->key_d == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + yes) / 64][(all->game->element[indexor("P")].px_column + yes + speed) / 64] != '1') 
-		// 	&& (all->map->map[(all->game->element[indexor("P")].px_line + no) / 64][(all->game->element[indexor("P")].px_column + yes + speed) / 64] != '1'))
-		// 	all->game->element[indexor("P")].px_column += 8;
+		else if ((all->states->key_d == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + 63) / 64][(all->game->element[indexor("P")].px_column + 63 + 1) / 64] != '1') && 
+			(all->map->map[all->game->element[indexor("P")].px_line / 64][(all->game->element[indexor("P")].px_column + 63 + 1) / 64] != '1'))
+			all->game->element[indexor("P")].px_column += 1;
 		// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, previous_pixel_column, previous_pixel_line);
 		// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
 	// }
@@ -711,42 +694,42 @@ int	callback(int code, void *arg)
 	// esquerda
 	// while (code == 97)
 	// {
-		if ((all->states->key_a == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + no) / 64][(all->game->element[indexor("P")].px_column + no - speed) / 64] != '1') && 
-			(all->map->map[(all->game->element[indexor("P")].px_line + yes) / 64][(all->game->element[indexor("P")].px_column + no - speed) / 64] != '1'))
+		if ((all->states->key_a == 1) && (all->map->map[(all->game->element[indexor("P")].px_line) / 64][(all->game->element[indexor("P")].px_column - speed) / 64] != '1') && 
+			(all->map->map[(all->game->element[indexor("P")].px_line + 63) / 64][(all->game->element[indexor("P")].px_column - speed) / 64] != '1'))
 			// (code == 97 && all->map->map[(all->game->element[indexor("P")].px_line + 64) / 64][(all->game->element[indexor("P")].px_column - 10 - 1) / 64] != '1'))
 			all->game->element[indexor("P")].px_column -= speed;
-		// else if ((all->states->key_a == 1) && (all->map->map[(all->game->element[indexor("P")].px_line) / 64][(all->game->element[indexor("P")].px_column - 8) / 64] != '1') && 
-		// 	(code == 97 && all->map->map[(all->game->element[indexor("P")].px_line + yes) / 64][(all->game->element[indexor("P")].px_column - 8) / 64] != '1'))
-		// 	all->game->element[indexor("P")].px_column -= 8;
+		else if ((all->states->key_a == 1) && (all->map->map[(all->game->element[indexor("P")].px_line) / 64][(all->game->element[indexor("P")].px_column - 1) / 64] != '1') && 
+			(code == 97 && all->map->map[(all->game->element[indexor("P")].px_line + 63) / 64][(all->game->element[indexor("P")].px_column - 1) / 64] != '1'))
+			all->game->element[indexor("P")].px_column -= 1;
 	// }
 	// cima
 	// while (code == 19)
 	// {
-		if ((all->states->key_w == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + no - speed) / 64][(all->game->element[indexor("P")].px_column + no) / 64] != '1') &&
-			(all->map->map[(all->game->element[indexor("P")].px_line + no - speed) / 64][(all->game->element[indexor("P")].px_column + yes) / 64] != '1'))
+		if ((all->states->key_w == 1) && (all->map->map[(all->game->element[indexor("P")].px_line - speed) / 64][all->game->element[indexor("P")].px_column / 64] != '1') &&
+			(all->map->map[(all->game->element[indexor("P")].px_line - speed) / 64][(all->game->element[indexor("P")].px_column + 63) / 64] != '1'))
 			// (code == 119 && all->map->map[(all->game->element[indexor("P")].px_line - 10 - 1 + 64) / 64][all->game->element[indexor("P")].px_column / 64] != '1'))
 			all->game->element[indexor("P")].px_line -= speed;
-		// else if ((all->states->key_w == 1) && (all->map->map[(all->game->element[indexor("P")].px_line - 8) / 64][all->game->element[indexor("P")].px_column / 64] != '1') &&
-		// 	(all->map->map[(all->game->element[indexor("P")].px_line - 8) / 64][(all->game->element[indexor("P")].px_column + yes) / 64] != '1'))
-		// 	all->game->element[indexor("P")].px_line -= 8;		
+		else if ((all->states->key_w == 1) && (all->map->map[(all->game->element[indexor("P")].px_line - 1) / 64][all->game->element[indexor("P")].px_column / 64] != '1') &&
+			(all->map->map[(all->game->element[indexor("P")].px_line - 1) / 64][(all->game->element[indexor("P")].px_column + 63) / 64] != '1'))
+			all->game->element[indexor("P")].px_line -= 1;		
 	// }
 	// baixo
 	// while (code == 115)
 	// {
-		if ((all->states->key_s == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + yes + speed) / 64][(all->game->element[indexor("P")].px_column + yes) / 64] != '1') &&
-				(all->map->map[(all->game->element[indexor("P")].px_line + yes + speed) / 64][(all->game->element[indexor("P")].px_column + no) / 64] != '1'))
-			// (code == 115 && all->map->map[(all->game->element[indexor("P")].px_line + 64 + 80 - 1) / 64][all->game->element[indexor("P")].px_column / 64] != '1'))
+		if ((all->states->key_s == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + 63 + speed) / 64][(all->game->element[indexor("P")].px_column + 63) / 64] != '1') &&
+				(all->map->map[(all->game->element[indexor("P")].px_line + 63 + speed) / 64][all->game->element[indexor("P")].px_column / 64] != '1'))
+			// (code == 115 && all->map->map[(all->game->element[indexor("P")].px_line + 64 + 10 - 1) / 64][all->game->element[indexor("P")].px_column / 64] != '1'))
 			all->game->element[indexor("P")].px_line += speed;
-		// else if ((all->states->key_s == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + yes + 8) / 64][(all->game->element[indexor("P")].px_column + yes) / 64] != '1') &&
-		// 		(all->map->map[(all->game->element[indexor("P")].px_line + 63 + 8) / 64][all->game->element[indexor("P")].px_column / 64] != '1'))
-		// 	all->game->element[indexor("P")].px_line += 8;		
+		else if ((all->states->key_s == 1) && (all->map->map[(all->game->element[indexor("P")].px_line + 63 + 1) / 64][(all->game->element[indexor("P")].px_column + 63) / 64] != '1') &&
+				(all->map->map[(all->game->element[indexor("P")].px_line + 63 + 1) / 64][all->game->element[indexor("P")].px_column / 64] != '1'))
+			all->game->element[indexor("P")].px_line += 1;		
 	}
 	// }
 //-----------------------------
 		
 	// Atualiza o INDEX do player na MATRIZ!!
 	all->game->element[indexor("P")].column = all->game->element[indexor("P")].px_column / 64;
-	all->game->element[indexor("P")].line = all->game->element[indexor("P")].px_line / 64;
+	all->game->element[indexor("P")].column = all->game->element[indexor("P")].px_column / 64;
 
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
 	// update_images(all->mlx, all->window, all, previous_pixel_column, previous_pixel_line);
@@ -773,19 +756,7 @@ int	check_key_pressed(int	code, void *arg)
 	if (code == 115)
 		all->states->key_s = 1;
 	if (code == 65293)
-	{
-		// all->states->key_enter = 1;
-		if ((check_hitbox(all, 'Y') == 1) && all->states->terminal_hook_flag == 0)
-		{
-			all->states->terminal_hook_flag = 1;
-			all->states->terminal = 1;
-			// open_terminal(all);
-		}
-		else
-			all->states->terminal_hook_flag = 0;
-	}
-	if (code == 65506)
-		all->states->key_shift = 1;
+		all->states->key_enter = 1;
 	// callback(code, all);
 	return (0);
 }
@@ -804,132 +775,34 @@ int	check_key_released(int code, void *arg)
 		all->states->key_w = 0;
 	if (code == 115)
 		all->states->key_s = 0;
-	if (code == 65506)
-		all->states->key_shift = 0;
-	// if (code == 65293)
-	// 	all->states->key_enter = 0;
+	if (code == 65293)
+		all->states->key_enter = 0;
 	// callback(code, all);
 	return (0);
 }
 
-int	compare_message(char *string1, char *string2)
-{
-	int	index1;
-	int	index2;
 
-	index1 = 0;
-	index2 = 0;
-	while(string2[index2] != '|' && string1[index1] && string2[index2] && string1[index1] == string2[index2])
-	{
-		index1++;
-		index2++;
-	}
-	if (string2[index2] == '|')
-		index2++;
-	return (string1[index1] - string2[index2]);
-}
-
-void	check_message(t_all *all)
-{
-	int	size;
-
-	size = 0;
-	while (all->game->writed[size] && all->game->writed[size] != '|')
-		size++;
-	int	a = 10;
-	while (a-- > 0)
-		printf("size: %d    Compare: %d\n\n------------------------->>>>>>>>>>>>>>>>>>>>>>>>>", size, compare_message("free(string)", all->game->writed));
-	
-	if ((size == 12) && (compare_message("free(string)", all->game->writed) == 0))
-	{
-		printf("size: %d    Compare: %d\n\n------------------------->>>>>>>>>>>>>>>>>>>>>>>>>", size, compare_message("free(string)", all->game->writed));
-		all->game->memory = 0;
-		all->states->undefined_behavior = 0;
-		return ;
-	}
-	else if ((size == 9) && (compare_message("malloc(", all->game->writed) == 0))
-	{
-		all->game->memory = all->game->writed[7];
-		return ;
-	}
-}
-
-int new_window_key_released(int keycode, void *arg)
-{
-	t_all *all;
-
-	all = (t_all *)arg;
-	if (keycode == 65505 || keycode == 65506)
-		all->states->key_shift = 0;
-	return (0);
-}
-
-void	put_shift_character(t_all *all, int	code)
-{
-	if (code == 56)
-	{
-		all->game->writed[all->game->writed_index] = '(';
-        all->game->writed[all->game->writed_index + 1] = '|';
-        all->game->writed[all->game->writed_index + 2] = '\0';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 11 + ((all->game->writed_index) * 6), 21);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-		all->game->writed_index++;
-	}
-	else if (code == 57)
-	{
-        all->game->writed[all->game->writed_index] = ')';
-        all->game->writed[all->game->writed_index + 1] = '|';
-        all->game->writed[all->game->writed_index + 2] = '\0';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 11 + ((all->game->writed_index) * 6), 21);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-		all->game->writed_index++;
-	}
-}
-
-//adaptar os códigos para diferentes tipos de teclado.... shift 8, e shift 9 são para windows PT-BR, verificar os teclados dos 2 clusters da 42.
-
-                                  //       IMPORTANTE
-
-								  
-int new_window_key_pressed(int keycode, void *arg)
+int key_hook(int keycode, void *arg)
 {
 	t_all *all;
 
 	printf("key pressed: %d\n", keycode);
 	all = (t_all *)arg;
-	// static int	line = 10;
-	// static int	column = 30;
-	if (keycode == 65505 || keycode == 65506)
-		all->states->key_shift = 1;
-	if (all->states->key_shift == 1 && (keycode == 56 || keycode == 57))
-		put_shift_character(all, keycode);
-    else if ((all->states->key_shift == 0) && ((keycode >= 0 && keycode <= 25) || (keycode >= 97 && keycode <= 122) || (keycode == 32)
-	|| (keycode >= 48 && keycode <= 57)))
+	static int	index = 0;
+	static int	line = 10;
+	static int	column = 30;
+    if ((keycode >= 0 && keycode <= 25) || (keycode >= 97 && keycode <= 122) || (keycode == 32)
+	|| (keycode >= 48 && keycode <= 57))
 	{
-        all->game->writed[all->game->writed_index] = (char)keycode;
-        all->game->writed[all->game->writed_index + 1] = '|';
-        all->game->writed[all->game->writed_index + 2] = '\0';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), 21);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-		all->game->writed_index++;
+        all->game->writed[index] = (char)keycode;
+        all->game->writed[index + 1] = '\0';
+		mlx_string_put(all->mlx, all->window_terminal, line, column, 16711680, all->game->writed);
+		index++;
 	}
-	else if (keycode == 65288)
+	if (keycode == 65307)
+    // if (keycode == 65293)
 	{
-		all->game->writed[all->game->writed_index] = '\0';
-		if (all->game->writed_index > 0)
-			all->game->writed_index--;
-		all->game->writed[all->game->writed_index] = '|';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), 18);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-	}
-	// if (keycode == 65307)
-    else if (keycode == 65293)
-	{
-		// if (all->states->terminal_hook_flag == 1)
-		// 	all->states->terminal_hook_flag = 0;
-		check_message(all);
-		all->game->writed_index = 0;
-		all->game->writed[all->game->writed_index] = '\0';
+		index = 0;
 		all->states->terminal = 0;
 		all->states->key_enter = 0;
 		all->states->key_a = 0;
@@ -937,88 +810,24 @@ int new_window_key_pressed(int keycode, void *arg)
 		all->states->key_s = 0;
 		all->states->key_w = 0;
 		mlx_destroy_window(all->mlx, all->window_terminal);
-		usleep(1000);
 		all->window_terminal = NULL;
 		all->states->terminal_hook_flag = 0;
-		// usleep(10000);
-		// else if (all->states->terminal_hook_flag == 0)
-		// {
-		// }
+		usleep(10000);
 	}
         printf("Tecla Enter pressionada\n"); 	
     return 0;
 }
 
-// int key_hook(int keycode, void *arg)
-// {
-// 	t_all *all;
-
-// 	printf("key pressed: %d\n", keycode);
-// 	all = (t_all *)arg;
-// 	// static int	line = 10;
-// 	// static int	column = 30;
-//     if ((keycode >= 0 && keycode <= 25) || (keycode >= 97 && keycode <= 122) || (keycode == 32)
-// 	|| (keycode >= 48 && keycode <= 57))
-// 	{
-//         all->game->writed[all->game->writed_index] = (char)keycode;
-//         all->game->writed[all->game->writed_index + 1] = '|';
-//         all->game->writed[all->game->writed_index + 2] = '\0';
-// 		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), 21);
-// 		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-// 		all->game->writed_index++;
-// 	}
-// 	if (keycode == 65288)
-// 	{
-// 		all->game->writed[all->game->writed_index] = '\0';
-// 		if (all->game->writed_index > 0)
-// 			all->game->writed_index--;
-// 		all->game->writed[all->game->writed_index] = '|';
-// 		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), 21);
-// 		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-// 	}
-// 	// if (keycode == 65307)
-// 	if (keycode == 65293)
-// 	{
-// 		if (all->states->terminal_hook_flag == 1)
-// 			all->states->terminal_hook_flag = 0;
-// 		else if (all->states->terminal_hook_flag == 0)
-// 		{
-// 			check_message(all);
-// 			all->game->writed_index = 0;
-// 			all->game->writed[all->game->writed_index] = '\0';
-// 			all->states->terminal = 0;
-// 			all->states->key_enter = 0;
-// 			all->states->key_a = 0;
-// 			all->states->key_d = 0;
-// 			all->states->key_s = 0;
-// 			all->states->key_w = 0;
-// 			mlx_destroy_window(all->mlx, all->window_terminal);
-// 			usleep(1000);
-// 			all->window_terminal = NULL;
-// 			// all->states->terminal_hook_flag = 0;
-// 			// usleep(10000);
-// 		}
-// 	}
-//         printf("Tecla Enter pressionada\n"); 	
-//     return 0;
-// }
-
 void open_terminal(t_all *all)
 {
-	// void	*window2;
-
     if (!all->window_terminal)
     {
-		// all->window2 = mlx_new_window(all->mlx, 160, 160, "TERMINAL");
-		// usleep(100000);
-		all->window_terminal = mlx_new_window(all->mlx, 180, 140, "TERMINAL");
-		// mlx_key_hook(all->window_terminal, key_hook, all);
-		mlx_hook(all->window_terminal, 2, 1L<<0, new_window_key_pressed, all);
-		mlx_hook(all->window_terminal, 3, 1L<<1, new_window_key_released, all);
-		// if (all->states->terminal_hook_flag == 1)
-		// {
-		// 	all->states->terminal_hook_flag = 0;
-		// }
+		all->window_terminal = mlx_new_window(all->mlx, 320, 320, "TERMINAL");
+		if (all->states->terminal_hook_flag == 0)
+		{
+			mlx_key_hook(all->window_terminal, key_hook, all);
+			all->states->terminal_hook_flag = 1;
+		}
         // mlx_hook(all->window_terminal, 2, 1L<<0, key_hook, all);
         mlx_string_put(all->mlx, all->window_terminal, 10, 10, 16711680, "Comand:\n");
     }
@@ -1033,19 +842,9 @@ int game_loop(void *arg)
         open_terminal(all);
         // all->states->terminal = 0;
     }
-	// if ((all->states->terminal != 0) && (all->window2 != NULL))
-	// {
-	// 	usleep(100000);
-	// 	mlx_destroy_window(all->mlx, all->window2);
-	// 	all->window2 = NULL;
-	// }
-    if (all->states->won == 1)
-	{
-        make_sound(900000);
-		
-	}
-	
-	// make_sound(200000);
+
+    if (all->states->full_colectables == 1 && all->states->right_letters == 1)
+        make_sound(500000);
 
     // Criação da janela de terminal apenas quando necessário
     // if (all->states->terminal == 1 && all->window_terminal == NULL)
@@ -1125,23 +924,18 @@ int	indexor(char *x)
 void	general_settings(t_all *all)
 {
 	int	count;
-	int	flag = 1;
 
 	count = 0;
 	all->game->speed = 2;
-	all->game->usleep = 20000;
-	all->game->shadow = 0;
+	all->game->usleep = 19000;
 	all->game->real_elements = "PEC10RXITYO";
 	if (all->images)
 		all->images->background = all->images->grass;
-	if (flag == 1)
-	{
-		while (all->game->real_elements[count])
-			count++;
-		all->game->elements_quantity = count;
-		indexor(all->game->real_elements);
-		flag = 0;
-	}
+	all->game->shadow = 0;
+	while (all->game->real_elements[count])
+		count++;
+	all->game->elements_quantity = count;
+	indexor(all->game->real_elements);
 }
 
 int	main(int argc, char *argv[])
@@ -1156,13 +950,12 @@ int	main(int argc, char *argv[])
 		return (1);
 	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
 	*s_play = (t_playerinfo){0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
-	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}};
-	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, {0}};
+	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0};
 	all->map = s_map;
 	all->play = s_play;
 	all->game = s_game;
 	all->states = states;
-	all->window2 = NULL;
 	general_settings(all);
 	if (!(check_file_name(argv[1])))
 		return (1);

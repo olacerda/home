@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 21:54:15 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/26 06:52:57 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/27 10:58:20 by olacerda         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef SO_LONG_H
 # define SO_LONG_H
@@ -24,6 +24,11 @@ typedef struct s_states
 	int	key_a;
 	int	key_s;
 	int	key_d;
+	int	key_shift;
+	int	key_enter;
+	int	terminal_hook_flag;
+	int won;
+	int	undefined_behavior;
 } t_states;
 
 typedef struct s_element
@@ -43,12 +48,13 @@ typedef struct s_gameinfo
 	// int		*count_elements;
 	int		e_line;
 	int		e_column;
-	int		won;
 	int		speed;
 	int		usleep;
 	int		shadow;
 	char	*real_elements;
 	int		elements_quantity;
+	int		writed_index;
+	int		memory;
 	char	writed[10000];
 } t_gameinfo;
 
@@ -120,6 +126,7 @@ typedef struct s_all_images
 	t_image *T;
 	t_image *color;
 	t_image *background;
+	t_image	*blank_letter;
 } t_all_images;
 
 typedef struct s_all
@@ -132,6 +139,7 @@ typedef struct s_all
 	void			*mlx;
 	void			*window;
 	void			*window_terminal;
+	void			*window2;
 } t_all;
 
 
@@ -158,8 +166,9 @@ t_image			*image_initiator(void *mlx, int wide, int tall);
 void			sheet_to_image_convertor(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line);
 t_all_images	*all_images_initiator(void *mlx);
 void			color_image(t_image *image, int flag);
-
+void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_gameinfo *game);
 void			put_images(void *mlx, t_mapinfo *game, void *window, t_all_images *images);
+
 void			game_initializer(t_mapinfo *s_map, t_all *all);
 int				update_position(void *arg);
 void			update_images(void *mlx, void *window, t_all *all, int previous_pixel_column, int previous_pixel_line);
@@ -168,19 +177,29 @@ void			update_game(t_all *all);
 void 			make_sound(long frequency);
 int				game_loop(void *arg);
 int				check_map_size(t_all *all);
-int				check_letters_colected(t_all *all);
+void			check_letters_colected(t_all *all, char	element, int line, int column);
 
 int				check_key_pressed(int	code, void *arg);
 int				check_key_released(int code, void *arg);
+int 			key_hook(int keycode, void *arg);
+
 
 void			update_player_range(t_all *all);
-void			update_range_image(t_all *all, int	line, int column);
+void			update_hitbox(t_all *all, int line, int column, char element);
 int				check_player_range(t_all *all, char element);
-void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_gameinfo *game);
-int				indexor(char *x);
-int				check_player_range2(t_all *all, char element);
+int				check_hitbox(t_all *all, char element);
+
 long			get_full_time();
+
+int				indexor(char *x);
+
 void			general_settings(t_all *all);
+void 			open_terminal(t_all *all);
+int				compare_message(char *string1, char *string2);
+void			check_message(t_all *all);
+void			put_shift_character(t_all *all, int	code);
+int 			new_window_key_pressed(int keycode, void *arg);
+int				new_window_key_released(int keycode, void *arg);
 
 
 #endif
