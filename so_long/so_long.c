@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   so_long.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/28 08:14:03 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/29 19:44:55 by olacerda         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "so_long.h"
 //printf
@@ -152,7 +152,7 @@ t_sheet *sheet_initiator(void *mlx, int	sprite_number)
 	return (sheet);
 }
 
-t_image	*image_initiator(void *mlx, int wide, int tall)
+t_image	*image_initiator(void *mlx, int wide, int tall, char charr, t_element *elements)
 {
 	t_image *image;
 
@@ -162,6 +162,8 @@ t_image	*image_initiator(void *mlx, int wide, int tall)
 	image->tall = tall;
 	image->wide = wide;
 	image->mlx_st = mlx_new_image(mlx, wide, tall);
+	if (charr != '\0')
+		elements[indexor(&charr)].image_mlx = image->mlx_st;
 	if (!image->mlx_st)
 		return (NULL);
 	image->img = mlx_get_data_addr(image->mlx_st, &image->bpp, &image->sizeline, &image->endian);
@@ -328,7 +330,7 @@ void	color_image(t_image *image, int	flag)
 	}
 }
 
-t_all_images	*all_images_initiator(void *mlx)
+t_all_images	*all_images_initiator(void *mlx, t_all *all)
 {
 	t_all_images *images;
 
@@ -337,18 +339,18 @@ t_all_images	*all_images_initiator(void *mlx)
 		return (NULL);
 	images->grass_wall_sheet = sheet_initiator(mlx, 1);
 	images->letters_sheet = sheet_initiator(mlx, 2);
-	
-	images->R = image_initiator(mlx, 64, 64);
-	images->X = image_initiator(mlx, 64, 64);
-	images->I = image_initiator(mlx, 64, 64);
-	images->T = image_initiator(mlx, 64, 64);
-	images->grass = image_initiator(mlx, 64, 64);
-	images->wall = image_initiator(mlx, 64, 64);
-	images->player = image_initiator(mlx, 64, 64);
-	images->collectable = image_initiator(mlx, 64, 64);
-	images->exit = image_initiator(mlx, 64, 64);
-	images->color = image_initiator(mlx, 300, 300);
-	images->blank_letter = image_initiator(mlx, 500, 500);
+	images->R = image_initiator(mlx, 64, 64, 'R', all->game->element);
+	images->X = image_initiator(mlx, 64, 64, 'X', all->game->element);
+	images->I = image_initiator(mlx, 64, 64, 'I', all->game->element);
+	images->T = image_initiator(mlx, 64, 64, 'T', all->game->element);
+	images->Y = image_initiator(mlx, 64, 64, 'Y', all->game->element);
+	images->grass = image_initiator(mlx, 64, 64, '0', all->game->element);
+	images->wall = image_initiator(mlx, 64, 64, '1', all->game->element);
+	images->player = image_initiator(mlx, 64, 64, 'P', all->game->element);
+	images->collectable = image_initiator(mlx, 64, 64, 'C', all->game->element);
+	images->exit = image_initiator(mlx, 64, 64, 'E', all->game->element);
+	images->color = image_initiator(mlx, 300, 300, '\0', all->game->element);
+	images->blank_letter = image_initiator(mlx, 500, 500, '\0', all->game->element);
 	
 	sheet_to_image_convertor(images->grass_wall_sheet, images->wall, NULL, 1, 1);
 	// color_image(images->grass, 65280);
@@ -369,7 +371,20 @@ t_all_images	*all_images_initiator(void *mlx)
 	return (images);
 }
 
-void	put_images(void *mlx, t_mapinfo *map, void *window, t_all_images *images)
+void	check_bonus(t_all *all, char element, int line, int index)
+{
+	if (all->states->bonus == 1)
+	{
+		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&element)].image_mlx, index * 64, line * 64);
+	}
+	else if (all->states->bonus == 0)
+	{
+		all->map->map[line][index] = '0';
+		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor("0")].image_mlx, index * 64, line * 64); 
+	}
+}
+
+void	put_images(t_all *all, t_mapinfo *map, t_all_images *images)
 {
 	int	line;
 	int	index;
@@ -382,21 +397,23 @@ void	put_images(void *mlx, t_mapinfo *map, void *window, t_all_images *images)
 		while(map->map[line][index] != '\n' && (index < map->line_len))
 		{
 			if (map->map[line][index] == '0' || map->map[line][index] == 'E')
-				mlx_put_image_to_window(mlx, window, images->background->mlx_st, index * 64, line * 64);
+				mlx_put_image_to_window(all->mlx, all->window, images->background->mlx_st, index * 64, line * 64);
 			if (map->map[line][index] == '1')
-				mlx_put_image_to_window(mlx, window, images->wall->mlx_st, index * 64, line * 64);
+				mlx_put_image_to_window(all->mlx, all->window, images->wall->mlx_st, index * 64, line * 64);
 			if (map->map[line][index] == 'P')
-				mlx_put_image_to_window(mlx, window, images->player->mlx_st, index * 64, line * 64);
+				mlx_put_image_to_window(all->mlx, all->window, images->player->mlx_st, index * 64, line * 64);
 			if (map->map[line][index] == 'C')
-				mlx_put_image_to_window(mlx, window, images->collectable->mlx_st, index * 64, line * 64);
+				mlx_put_image_to_window(all->mlx, all->window, images->collectable->mlx_st, index * 64, line * 64);
 			if (map->map[line][index] == 'R')
-				mlx_put_image_to_window(mlx, window, images->R->mlx_st, index * 64, line * 64);
+				check_bonus(all, 'R', line, index);
 			if (map->map[line][index] == 'X')
-				mlx_put_image_to_window(mlx, window, images->X->mlx_st, index * 64, line * 64);
+				check_bonus(all, 'X', line, index);
 			if (map->map[line][index] == 'I')
-				mlx_put_image_to_window(mlx, window, images->I->mlx_st, index * 64, line * 64);
+				check_bonus(all, 'I', line, index);
 			if (map->map[line][index] == 'T')
-				mlx_put_image_to_window(mlx, window, images->T->mlx_st, index * 64, line * 64);
+				check_bonus(all, 'T', line, index);
+			if (map->map[line][index] == 'Y')
+				check_bonus(all, 'Y', line, index);
 			index++;
 		}
 		line++;
@@ -483,15 +500,15 @@ void	check_letters_colected(t_all *all, char	element, int line, int column)
 }
 
 // substituir a adicao pelo numero "48" pra ver se consegue entrar um pouco na imagem antes de coletar ela
-void	update_player_range(t_all *all)
-{
-	printf("Entrou no update_player_range ---------->>\n");
-	all->play->tl_range = all->map->map[(all->game->element[indexor("P")].px_line + 12) / 64][(all->game->element[indexor("P")].px_column + 12) / 64];
-	all->play->tr_range = all->map->map[(all->game->element[indexor("P")].px_line + 12) / 64][(all->game->element[indexor("P")].px_column + 50) / 64];
-	all->play->bl_range = all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 12) / 64];
-	all->play->br_range = all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 50) / 64];
-	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
-}
+// void	update_player_range(t_all *all)
+// {
+// 	printf("Entrou no update_player_range ---------->>\n");
+// 	all->play->tl_range = all->map->map[(all->game->element[indexor("P")].px_line + 12) / 64][(all->game->element[indexor("P")].px_column + 12) / 64];
+// 	all->play->tr_range = all->map->map[(all->game->element[indexor("P")].px_line + 12) / 64][(all->game->element[indexor("P")].px_column + 50) / 64];
+// 	all->play->bl_range = all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 12) / 64];
+// 	all->play->br_range = all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 50) / 64];
+// 	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
+// }
 
 void	update_hitbox(t_all *all, int line, int column, char element)
 {
@@ -544,115 +561,166 @@ int	check_hitbox(t_all *all, char element)
 	}
 	return (0);
 }
+//elements_quantity
+void	update_player_range(t_all *all, int line, int column)
+{
+	printf("Linha do elemento: %d   Coluna do objeto: %d\n\n", line, column);
+	mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&(all->map->map[line][column]))].image_mlx, column * 64, line * 64);
+}
 
 int	check_player_range(t_all *all, char element)
 {
-	printf("entrou no CHECK_PLAYER_RANGE 1------>>>>>>>>\n\n");
-	if (all->play->tl_range != element)
-	{
-		printf("saiu no: tl\n");
-		// update_hitbox(all, (all->game->element[indexor("P")].px_line / 64), (all->game->element[indexor("P")].px_column / 64));
-		return (1);
-	}
-	if (all->play->tr_range != element) 
-	{
-		printf("saiu no: tr\n");
-		// update_hitbox(all, (all->game->element[indexor("P")].px_line / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
-		return (1);
-	}
-	if (all->play->bl_range != element)
-	{
-		printf("saiu no: bl\n");
-		// update_hitbox(all, ((all->game->element[indexor("P")].px_line + 63) / 64), (all->game->element[indexor("P")].px_column / 64));
-		return (1);
-	}
-	if (all->play->br_range != element) 
-	{
-		printf("saiu no: br\n");
-		// update_hitbox(all, ((all->game->element[indexor("P")].px_line + 63) / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
-		return (1);
-	}
+	int	line;
+	int	column;
+
+	printf("entrou no check_hitbox----------->>>>>>>>>>>>>>>>>\n\n");
+	line = all->game->element[indexor("P")].px_line;
+	column = all->game->element[indexor("P")].px_column;
+	if (all->map->map[(line - 16) / 64][(column - 16) / 64] != element)
+		update_player_range(all, ((line - 16) / 64), ((column - 16) / 64));
+	if (all->map->map[(line - 16) / 64][(column + 79) / 64] != element)
+		update_player_range(all, ((line - 16) / 64), ((column + 79) / 64));
+	if (all->map->map[(line + 79) / 64][(column - 16) / 64] != element)
+		update_player_range(all, ((line + 79) / 64), ((column - 16) / 64));
+	if (all->map->map[(line + 79) / 64][(column + 79) / 64] != element)
+		update_player_range(all, ((line + 79) / 64), ((column + 79) / 64));
+
+	if (all->map->map[(line - 16) / 64][(column + 32) / 64] != element)
+		update_player_range(all, ((line - 16) / 64), ((column + 32) / 64));
+	if (all->map->map[(line + 32) / 64][(column + 79) / 64] != element)
+		update_player_range(all, ((line + 32) / 64), ((column + 32) / 64));
+	if (all->map->map[(line + 79) / 64][(column + 32) / 64] != element)
+		update_player_range(all, ((line + 79) / 64), ((column + 32) / 64));
+	if (all->map->map[(line + 32) / 64][(column - 16) / 64] != element)
+		update_player_range(all, ((line + 32) / 64), ((column - 16) / 64));
 	return (0);
 }
+
+// int	check_player_range(t_all *all, char element)
+// {
+// 	printf("entrou no CHECK_PLAYER_RANGE 1------>>>>>>>>\n\n");
+// 	if (all->play->tl_range != element)
+// 	{
+// 		printf("saiu no: tl\n");
+// 		// update_hitbox(all, (all->game->element[indexor("P")].px_line / 64), (all->game->element[indexor("P")].px_column / 64));
+// 		return (1);
+// 	}
+// 	if (all->play->tr_range != element) 
+// 	{
+// 		printf("saiu no: tr\n");
+// 		// update_hitbox(all, (all->game->element[indexor("P")].px_line / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
+// 		return (1);
+// 	}
+// 	if (all->play->bl_range != element)
+// 	{
+// 		printf("saiu no: bl\n");
+// 		// update_hitbox(all, ((all->game->element[indexor("P")].px_line + 63) / 64), (all->game->element[indexor("P")].px_column / 64));
+// 		return (1);
+// 	}
+// 	if (all->play->br_range != element) 
+// 	{
+// 		printf("saiu no: br\n");
+// 		// update_hitbox(all, ((all->game->element[indexor("P")].px_line + 63) / 64), ((all->game->element[indexor("P")].px_column + 63) / 64));
+// 		return (1);
+// 	}
+// 	return (0);
+// }
 // Todos coletaveis:
 void	update_game(t_all *all)
 {
-	if (check_player_range(all, '0') == 1)
+	static int flag = 0;
+
+	if ((all->states->full_colectables == 0) && (check_hitbox(all, 'C') == 1))
 	{
-		if ((all->states->full_colectables == 0) && (check_hitbox(all, 'C') == 1))
-		{
-			write(1, "\a", 1);
-			all->play->colected++;
-			if (all->play->colected >= all->game->element[indexor("C")].count)
-				all->states->full_colectables = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';
-		}
-		else if  ((all->play->R == 0) && (check_hitbox(all, 'R') == 1))
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';	
-			all->play->R = 1;
-		}
-		else if ((all->play->X == 0) && (check_hitbox(all, 'X') == 1))
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// all->states->terminal = 1;
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';
-			all->play->X = 1;
-		}
-		else if ((all->play->I == 0) && (check_hitbox(all, 'I') == 1))
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';	
-			all->play->I = 1;
-		}
-		else if ((all->play->T == 0) && (check_hitbox(all, 'T') == 1))
-		{
-			write(1, "\a", 1);
-			// static int flag = 1;
-			// if (flag == 1)
-			// {
-			// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
-			// 	flag = 0;
-			// }
-			// if (check_letters_colected(all) == 1)
-			// 	all->states->right_letters = 1;
-			// all->map->map[all->play->line][all->play->column] = '0';	
-			all->play->T = 1;
-		}
-		if ((check_hitbox(all, 'Y') == 1))
-		{
-			if (all->states->key_enter == 1)
-				all->states->terminal = 1;
-			printf("Y state: 1     Terminal state: %d\n\n", all->states->terminal);
-		}
-		if ((check_hitbox(all, 'E') == 1) && (all->states->won == 1))
-		{
-			all->states->full_colectables = 0;
-			mlx_clear_window(all->mlx, all->window);
-			mlx_destroy_window(all->mlx, all->window);
-			exit (0);
-		}
+		write(1, "\a", 1);
+		all->play->colected++;
+		if (all->play->colected >= all->game->element[indexor("C")].count)
+			all->states->full_colectables = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';
 	}
+	else if  ((all->play->R == 0) && (check_hitbox(all, 'R') == 1))
+	{
+		write(1, "\a", 1);
+		// static int flag = 1;
+		// if (flag == 1)
+		// {
+		// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
+		// 	flag = 0;
+		// }
+		// if (check_letters_colected(all) == 1)
+		// 	all->states->right_letters = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';	
+		all->play->R = 1;
+	}	
+	else if  (flag == 0 && (all->play->R == 0) && (check_hitbox(all, 'P') == 1))
+	{
+
+		write(1, "\a", 1);
+		// static int flag = 1;
+		// if (flag == 1)
+		// {
+		// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
+		// 	flag = 0;
+		// }
+		// if (check_letters_colected(all) == 1)
+		// 	all->states->right_letters = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';	
+		flag = 1;
+	}
+	else if ((all->play->X == 0) && (check_hitbox(all, 'X') == 1))
+	{
+		write(1, "\a", 1);
+		// static int flag = 1;
+		// all->states->terminal = 1;
+		// if (check_letters_colected(all) == 1)
+		// 	all->states->right_letters = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';
+		all->play->X = 1;
+	}
+	else if ((all->play->I == 0) && (check_hitbox(all, 'I') == 1))
+	{
+		write(1, "\a", 1);
+		// static int flag = 1;
+		// if (flag == 1)
+		// {
+		// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
+		// 	flag = 0;
+		// }
+		// if (check_letters_colected(all) == 1)
+		// 	all->states->right_letters = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';	
+		all->play->I = 1;
+	}
+	else if ((all->play->T == 0) && (check_hitbox(all, 'T') == 1))
+	{
+		write(1, "\a", 1);
+		// static int flag = 1;
+		// if (flag == 1)
+		// {
+		// 	mlx_new_window(all->mlx, 320, 320, "TERMINAL");
+		// 	flag = 0;
+		// }
+		// if (check_letters_colected(all) == 1)
+		// 	all->states->right_letters = 1;
+		// all->map->map[all->play->line][all->play->column] = '0';	
+		all->play->T = 1;
+	}
+	if ((check_hitbox(all, 'Y') == 1))
+	{
+		if (all->states->key_enter == 1)
+			all->states->terminal = 1;
+		printf("Y state: 1     Terminal state: %d\n\n", all->states->terminal);
+	}
+	if ((check_hitbox(all, 'E') == 1) && (all->states->won == 1))
+	{
+		all->states->full_colectables = 0;
+		mlx_clear_window(all->mlx, all->window);
+		mlx_destroy_window(all->mlx, all->window);
+		exit (0);
+	}
+	// if (check_player_range(all, '0') == 1)
+	// {
+	// }
 	printf("\nCOLECTED: %d\n", all->play->colected);
 	// printf("Letter State: %d\nCoin State: %d\n\n", all->states->right_letters, all->states->full_colectables);
 	printf("Todos coletaveis: %d\n\nLetras corretas: %d\n\nUndefined behavior: %d\n\n", all->states->full_colectables, all->states->right_letters, all->states->undefined_behavior);
@@ -754,7 +822,7 @@ int	callback(int code, void *arg)
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->grass->mlx_st, previous_pixel_column, previous_pixel_line);
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
 	// mlx_do_sync(all->mlx);
-	update_player_range(all);
+	// update_player_range(all);
 	update_game(all);                                               
 	return (0);
 }
@@ -964,7 +1032,20 @@ void	switch_strings(t_all *all, int keycode, int line)
 	mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 0, (30 + (5 * 20)) - 10);
 	mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->game->writed[line]);
 }
-								  
+				
+// void	reset_terminal_lines(t_all *all)
+// {
+// 	int top_line;
+// 	int	index;
+
+// 	index = 0;
+// 	top_line = 494;
+// 	while (top_line < 499)
+// 	{
+// 		all.
+// 	}
+// }
+
 int new_window_key_pressed(int keycode, void *arg)
 {
 	t_all *all;
@@ -1014,6 +1095,8 @@ int new_window_key_pressed(int keycode, void *arg)
 		all->game->writed[line][all->game->writed_index] = '\0';
 		put_string_on_terminal(all, 'x', line, 0);
 		line++;
+		if (line >= 20)
+			line = 5;
 		all->game->string_focused = line;
 		all->game->writed_index = 0;
 		all->states->swifting_strings = 0;
@@ -1158,8 +1241,9 @@ int game_loop(void *arg)
     {
         callback(1, all);
         update_background(all->images->letters_sheet, all->images->player, all->images->grass, 1, 6, all->game);
+		check_player_range(all, '0');
         if (all->game->shadow == 1)
-            mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
+			mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
         mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
         mlx_do_sync(all->mlx);
         usleep(all->game->usleep);
@@ -1176,7 +1260,7 @@ void game_initializer(t_mapinfo *s_map, t_all *all)
     if (!all->mlx)
         exit(1);
 
-    images = all_images_initiator(all->mlx);
+    images = all_images_initiator(all->mlx, all);
     all->images = images;
     all->window = mlx_new_window(all->mlx, s_map->line_len * 64, s_map->total_lines * 64, s_map->map_name);
     if (!all->window)
@@ -1184,7 +1268,7 @@ void game_initializer(t_mapinfo *s_map, t_all *all)
 
     all->window_terminal = NULL; // Inicializa como NULL
     general_settings(all);
-    put_images(all->mlx, s_map, all->window, images);
+    put_images(all, all->map, all->images);
 
     mlx_hook(all->window, 2, 1L<<0, check_key_pressed, all);
     mlx_hook(all->window, 3, 1L<<1, check_key_released, all);
@@ -1255,7 +1339,7 @@ int	main(int argc, char *argv[])
 	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
 	*s_play = (t_playerinfo){0, 0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
 	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, {{0}}};
-	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	all->map = s_map;
 	all->play = s_play;
 	all->game = s_game;
@@ -1281,7 +1365,7 @@ int	main(int argc, char *argv[])
 		return (1);
 	if (!check_close_walls(s_map))
 		return (1);
-	if (!(check_elements(s_map, s_play, s_game)))
+	if (!(check_elements(s_map, s_play, s_game, states)))
 		return (1);
 	// get_element_positions(s_game, s_map);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[0].charr, all->game->element[0].line, all->game->element[0].column);
@@ -1296,7 +1380,7 @@ int	main(int argc, char *argv[])
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[9].charr, all->game->element[9].line, all->game->element[9].column);
 	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[10].charr, all->game->element[10].line, all->game->element[10].column);
 	// printf("EU AQUI------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-	if (!check_all_paths(s_map, s_play, s_game))
+	if (!check_all_paths(s_map, s_play, s_game, states))
 		return (1);
 	write(1, "teste123", 5);
 	if (!check_map_size(all))

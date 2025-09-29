@@ -6,7 +6,7 @@
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:09:23 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/26 23:25:07 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/29 19:39:14 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -45,9 +45,9 @@ int		check_rectangle(t_mapinfo *s_map);
 int		check_close_walls(t_mapinfo *s_map);
 
 
-int		check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game);
+int		check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, t_states *states);
 // int		path_to_colectable(char **map, int	line, int column, int *colectables);
-int		path_to_colectable(char **map, int	line, int column, char	*to_colect, int *count);
+int		path_to_colectable(char **map, int	line, int column, char	to_colect, int *count);
 int		letters_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *elements);
 int		exit_colectables_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *elements);
 int		path_to_letters(char **map, int	line, int column, char	*to_colect, int *count);
@@ -61,7 +61,7 @@ int		check_file_name(char *name);
 void 	create_elements(t_gameinfo *s_game);
 void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game);
 void	get_element_positions(t_gameinfo *game, t_mapinfo *map);
-int		check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game);
+int		check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, t_states *states);
 
 
 

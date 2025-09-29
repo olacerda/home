@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 21:54:15 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/28 08:04:08 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/09/29 19:44:45 by olacerda         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef SO_LONG_H
 # define SO_LONG_H
@@ -31,6 +31,7 @@ typedef struct s_states
 	int won;
 	int	undefined_behavior;
 	int	swifting_strings;
+	int bonus;
 } t_states;
 
 typedef struct s_element
@@ -41,6 +42,7 @@ typedef struct s_element
 	int		column;
 	int		px_line;
 	int		px_column;
+	void	*image_mlx;
 } t_element;
 
 typedef struct s_gameinfo
@@ -127,6 +129,7 @@ typedef struct s_all_images
 	t_image *X;
 	t_image *I;
 	t_image *T;
+	t_image *Y;
 	t_image *color;
 	t_image *background;
 	t_image	*blank_letter;
@@ -165,12 +168,13 @@ char 			**create_map(t_mapinfo *s_map);
 void			free_map(char **game);
 
 t_sheet 		*sheet_initiator(void *mlx, int sprite_number);
-t_image			*image_initiator(void *mlx, int wide, int tall);
+t_image			*image_initiator(void *mlx, int wide, int tall, char charr, t_element *elements);
 void			sheet_to_image_convertor(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line);
-t_all_images	*all_images_initiator(void *mlx);
+t_all_images	*all_images_initiator(void *mlx, t_all *all);
 void			color_image(t_image *image, int flag);
 void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_gameinfo *game);
-void			put_images(void *mlx, t_mapinfo *game, void *window, t_all_images *images);
+void			put_images(t_all *all, t_mapinfo *map, t_all_images *images);
+void			check_bonus(t_all *all, char element, int line, int index);
 
 void			game_initializer(t_mapinfo *s_map, t_all *all);
 int				update_position(void *arg);
@@ -187,10 +191,10 @@ int				check_key_released(int code, void *arg);
 int 			key_hook(int keycode, void *arg);
 
 
-void			update_player_range(t_all *all);
-void			update_hitbox(t_all *all, int line, int column, char element);
 int				check_player_range(t_all *all, char element);
+void			update_player_range(t_all *all, int line, int column);
 int				check_hitbox(t_all *all, char element);
+void			update_hitbox(t_all *all, int line, int column, char element);
 
 long			get_full_time();
 
