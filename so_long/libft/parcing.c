@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parcing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 00:32:16 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/29 19:38:30 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/30 03:26:22 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "utils.h"
 
@@ -379,7 +379,6 @@ int	check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, 
 			return (0);	
 	}
 	free_map(map);
-
 	// printf("\nplayer position:\n\n\nLine: %d\nColumn: %d\n\n\n", s_play->line, s_play->column);
 	// printf("\nNOVO BOROGODOOOOOOOOOO\n\n\nLine: %d\nColumn: %d\n\n\n", s_play->line, s_play->column);
 	return (path);

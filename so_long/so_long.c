@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   so_long.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/29 19:44:55 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/30 07:35:13 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "so_long.h"
 //printf
@@ -371,54 +371,60 @@ t_all_images	*all_images_initiator(void *mlx, t_all *all)
 	return (images);
 }
 
-void	check_bonus(t_all *all, char element, int line, int index)
-{
-	if (all->states->bonus == 1)
-	{
-		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&element)].image_mlx, index * 64, line * 64);
-	}
-	else if (all->states->bonus == 0)
-	{
-		all->map->map[line][index] = '0';
-		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor("0")].image_mlx, index * 64, line * 64); 
-	}
-}
+// void	check_bonus(t_all *all, char element, int line, int index)
+// {
+// 	if (all->states->bonus == 1)
+// 	{
+// 		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&element)].image_mlx, index * 64, line * 64);
+// 	}
+// 	else if (all->states->bonus == 0)
+// 	{
+// 		all->map->map[line][index] = '0';
+// 		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor("0")].image_mlx, index * 64, line * 64); 
+// 	}
+// }
 
 void	put_images(t_all *all, t_mapinfo *map, t_all_images *images)
 {
 	int	line;
 	int	index;
 
-	line = 0; 	
-	index = 0;
-	while(map->map[line] != NULL && (line < map->total_lines))
+	line = -1; 	
+	while(map->map[++line] != NULL && (line < map->total_lines))
 	{
-		index = 0;
-		while(map->map[line][index] != '\n' && (index < map->line_len))
+		index = -1;
+		while(map->map[line][++index] != '\n' && (index < map->line_len))
 		{
 			if (map->map[line][index] == '0' || map->map[line][index] == 'E')
 				mlx_put_image_to_window(all->mlx, all->window, images->background->mlx_st, index * 64, line * 64);
-			if (map->map[line][index] == '1')
+			else if (map->map[line][index] == '1')
 				mlx_put_image_to_window(all->mlx, all->window, images->wall->mlx_st, index * 64, line * 64);
-			if (map->map[line][index] == 'P')
+			else if (map->map[line][index] == 'P')
 				mlx_put_image_to_window(all->mlx, all->window, images->player->mlx_st, index * 64, line * 64);
-			if (map->map[line][index] == 'C')
+			else if (map->map[line][index] == 'C')
 				mlx_put_image_to_window(all->mlx, all->window, images->collectable->mlx_st, index * 64, line * 64);
-			if (map->map[line][index] == 'R')
-				check_bonus(all, 'R', line, index);
-			if (map->map[line][index] == 'X')
-				check_bonus(all, 'X', line, index);
-			if (map->map[line][index] == 'I')
-				check_bonus(all, 'I', line, index);
-			if (map->map[line][index] == 'T')
-				check_bonus(all, 'T', line, index);
-			if (map->map[line][index] == 'Y')
-				check_bonus(all, 'Y', line, index);
-			index++;
+			else if ((all->states->bonus == 0) || ((all->states->bonus == 1) && map->map[line][index] != 'Y'))
+			{
+				all->map->map[line][index] = '0';
+				mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor("0")].image_mlx, index * 64, line * 64); 
+			}
 		}
-		line++;
 	}
 }
+void	put_letter(t_all *all)
+{
+	char	*letters;
+	int	index;
+
+	index = -1;
+	letters = "RXIT";
+	while (letters[++index])
+	{
+		all->map->map[all->game->element[indexor(&(letters[index]))].line][all->game->element[indexor(&(letters[index]))].column] = all->game->element[indexor(&(letters[index]))].charr;
+		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&(letters[index]))].image_mlx, all->game->element[indexor(&(letters[index]))].px_column, all->game->element[indexor(&(letters[index]))].px_line);
+	}
+}
+
 
 void	update_images(void *mlx, void *window, t_all *all, int previous_pixel_column, int previous_pixel_line)
 {
@@ -499,6 +505,8 @@ void	check_letters_colected(t_all *all, char	element, int line, int column)
 		all->states->right_letters = 1;	
 }
 
+//letter_cole
+
 // substituir a adicao pelo numero "48" pra ver se consegue entrar um pouco na imagem antes de coletar ela
 // void	update_player_range(t_all *all)
 // {
@@ -509,6 +517,8 @@ void	check_letters_colected(t_all *all, char	element, int line, int column)
 // 	all->play->br_range = all->map->map[(all->game->element[indexor("P")].px_line + 50) / 64][(all->game->element[indexor("P")].px_column + 50) / 64];
 // 	printf("\n\ntl: %c\ntr: %c\nbl: %c\nbr: %c\n\n\n", all->play->tl_range, all->play->tr_range, all->play->bl_range, all->play->br_range);
 // }
+
+//put_le
 
 void	update_hitbox(t_all *all, int line, int column, char element)
 {
@@ -564,8 +574,11 @@ int	check_hitbox(t_all *all, char element)
 //elements_quantity
 void	update_player_range(t_all *all, int line, int column)
 {
-	printf("Linha do elemento: %d   Coluna do objeto: %d\n\n", line, column);
-	mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&(all->map->map[line][column]))].image_mlx, column * 64, line * 64);
+	if (all->map->map[line][column] != '1')
+	{
+		printf("Linha do elemento: %d   Coluna do objeto: %d\n\n", line, column);
+		mlx_put_image_to_window(all->mlx, all->window, all->game->element[indexor(&(all->map->map[line][column]))].image_mlx, column * 64, line * 64);
+	}
 }
 
 int	check_player_range(t_all *all, char element)
@@ -573,7 +586,6 @@ int	check_player_range(t_all *all, char element)
 	int	line;
 	int	column;
 
-	printf("entrou no check_hitbox----------->>>>>>>>>>>>>>>>>\n\n");
 	line = all->game->element[indexor("P")].px_line;
 	column = all->game->element[indexor("P")].px_column;
 	if (all->map->map[(line - 16) / 64][(column - 16) / 64] != element)
@@ -584,7 +596,6 @@ int	check_player_range(t_all *all, char element)
 		update_player_range(all, ((line + 79) / 64), ((column - 16) / 64));
 	if (all->map->map[(line + 79) / 64][(column + 79) / 64] != element)
 		update_player_range(all, ((line + 79) / 64), ((column + 79) / 64));
-
 	if (all->map->map[(line - 16) / 64][(column + 32) / 64] != element)
 		update_player_range(all, ((line - 16) / 64), ((column + 32) / 64));
 	if (all->map->map[(line + 32) / 64][(column + 79) / 64] != element)
@@ -592,7 +603,7 @@ int	check_player_range(t_all *all, char element)
 	if (all->map->map[(line + 79) / 64][(column + 32) / 64] != element)
 		update_player_range(all, ((line + 79) / 64), ((column + 32) / 64));
 	if (all->map->map[(line + 32) / 64][(column - 16) / 64] != element)
-		update_player_range(all, ((line + 32) / 64), ((column - 16) / 64));
+		update_player_range(all, ((line + 32) / 64), ((column - 16) / 64));	
 	return (0);
 }
 
@@ -655,7 +666,6 @@ void	update_game(t_all *all)
 	else if  (flag == 0 && (all->play->R == 0) && (check_hitbox(all, 'P') == 1))
 	{
 
-		write(1, "\a", 1);
 		// static int flag = 1;
 		// if (flag == 1)
 		// {
@@ -722,6 +732,11 @@ void	update_game(t_all *all)
 	// {
 	// }
 	printf("\nCOLECTED: %d\n", all->play->colected);
+	printf("Letters colected: %s\n\n", all->play->letter_colected);
+	printf("Character R -> Linha: %d  -> Column: %d    Char no bloco: %c\n", all->game->element[indexor("R")].line, all->game->element[indexor("R")].column, all->map->map[all->game->element[indexor("R")].line][all->game->element[indexor("R")].column]);
+	printf("Character X -> Linha: %d  -> Column: %d    Char no bloco: %c\n", all->game->element[indexor("X")].line, all->game->element[indexor("X")].column, all->map->map[all->game->element[indexor("X")].line][all->game->element[indexor("X")].column]);
+	printf("Character I -> Linha: %d  -> Column: %d    Char no bloco: %c\n", all->game->element[indexor("I")].line, all->game->element[indexor("I")].column, all->map->map[all->game->element[indexor("I")].line][all->game->element[indexor("I")].column]);
+	printf("Character T -> Linha: %d  -> Column: %d    Char no bloco: %c\n", all->game->element[indexor("T")].line, all->game->element[indexor("T")].column, all->map->map[all->game->element[indexor("T")].line][all->game->element[indexor("T")].column]);
 	// printf("Letter State: %d\nCoin State: %d\n\n", all->states->right_letters, all->states->full_colectables);
 	printf("Todos coletaveis: %d\n\nLetras corretas: %d\n\nUndefined behavior: %d\n\n", all->states->full_colectables, all->states->right_letters, all->states->undefined_behavior);
 	printf("Memory available: %d\n", all->game->memory);
@@ -823,7 +838,7 @@ int	callback(int code, void *arg)
 	// mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
 	// mlx_do_sync(all->mlx);
 	// update_player_range(all);
-	update_game(all);                                               
+	// update_game(all);                                               
 	return (0);
 }
 
@@ -881,52 +896,85 @@ int	check_key_released(int code, void *arg)
 	return (0);
 }
 
-int	compare_message(char *string1, char *string2, int limit)
+int	compare_message(t_all * all, char *string1, char *string2, int limit)
 {
 	int	index1;
 	int	index2;
 
 	index1 = 0;
-	index2 = 0;
-	printf("Limit: %d\n\n", limit);
+	index2 = all->terminal->pc_number_size;
+	printf("Str1 char: %c   ------- str2 char: %c\n\n", string1[index1], string2[index2]);
 	while(string2[index2] != '_' && string1[index1] && string2[index2] && 
 		string1[index1] == string2[index2] && limit > 0)
 	{
-		printf("\ncomparason between: %c and %c\n\n", string1[index1], string2[index2]);
+		printf("\ncomparason between: -------------------------------------->>>>> %c and %c\n\n", string1[index1], string2[index2]);
 		index1++;
 		index2++;
 		limit--;
 	}
-	if (string2[index2] == '_' || (string2[index2] >= 48 && string2[index2] <= 57))
+	if (string2[index2] == '_' || (string2[index2] == '\0') || (string2[index2] >= 48 && string2[index2] <= 57))
 		index2--;
 	if (index1 > 0)
 		index1--;
-	printf("Returning: %c (%d)  minus  %c (%d)\n\n", string1[index1], string1[index1], string2[index2], string2[index2]);
+	printf("Returning: ----------------------------------->>>>>>>%c (%d)  minus  %c (%d)\n\n", string1[index1], string1[index1], string2[index2], string2[index2]);
 	return (string1[index1] - string2[index2]);
 }
 
-void	check_message(t_all *all, int line)
+void	check_message(t_all *all, int *line)
 {
 	int	size;
+	int	index;
+	char	*to_write;
 
+	to_write = NULL;
+	index = all->terminal->pc_number_size;
 	size = 0;
-	while (all->game->writed[line][size] && all->game->writed[line][size] != '_')
-		size++;
-	// int	a = 10;
-	// while (a-- > 0)
-	// 	printf("size: %d    Compare: %d\n\n------------------------->>>>>>>>>>>>>>>>>>>>>>>>>", size, compare_message("free(string)", all->game->writed[line], (12 - (5 * (size == 12)))));
-	
-	if ((size == 12) && (compare_message("free(memory)", all->game->writed[line], 12) == 0))
+	while (all->terminal->writed[*line][index] && all->terminal->writed[*line][index] != '_')
 	{
-		// printf("size: %d    Compare: %d\n\n------------------------->>>>>>>>>>>>>>>>>>>>>>>>>", size, compare_message("free(string)", all->game->writed[line], (12 - (5 * (size == 12)))));
+		index++;
+		size++;
+	}
+	printf("Size:------------------------------->>>>>>>>>> %d\n", size);
+	if ((size == 12) && (compare_message(all, "free(memory)", all->terminal->writed[*line], 12) == 0))
+	{
+		all->play->letters_colected_amount = 0;
+		all->play->letter_colected[0] = '\0';
 		all->game->memory = 0;
 		all->states->undefined_behavior = 0;
+		all->play->R = 0;
+		all->play->X = 0;
+		all->play->I = 0;
+		all->play->T = 0;
 		return ;
 	}
-	else if ((size == 9) && (compare_message("malloc(", all->game->writed[line], 7) == 0))
+	else if ((size == 9) && (compare_message(all, "malloc(", all->terminal->writed[*line], 8) == 0))
 	{
-		all->game->memory = (all->game->writed[line][7] - 48);
+		all->game->memory = (all->terminal->writed[*line][all->terminal->pc_number_size + 7] - 48);
 		return ;
+	}
+	else if ((size == 7) && (all->states->letters_compiled == 1) && (compare_message(all, "./a.out", all->terminal->writed[*line], 7) == 0))
+	{
+		put_letter(all);
+	}
+	else if ((size == 12) && (compare_message(all, "cc letters.c", all->terminal->writed[*line], 12)) == 0)
+	{
+		all->states->letters_compiled = 1;
+	}
+	else if ((size == 2) && (compare_message(all, "ls", all->terminal->writed[*line], 2)) == 0)
+	{
+		all->terminal->writed_line++;
+		all->terminal->writed_index = 0;
+		if (all->states->letters_compiled == 0)
+			to_write = "letters.c";
+		else
+			to_write = "letters.c   a.out";
+		while (to_write[all->terminal->writed_index])
+		{
+			all->terminal->writed[*line][all->terminal->writed_index] = to_write[all->terminal->writed_index];
+			all->terminal->writed_index++;
+		}
+		all->terminal->writed[*line][all->terminal->writed_index] = '\0';
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[all->terminal->writed_line]);	
 	}
 }
 
@@ -942,26 +990,28 @@ int new_window_key_released(int keycode, void *arg)
 	return (0);
 }
 
+//COLECTED
+
 void	put_shift_character(t_all *all, int	code, int line)
 {
 	(void)line;
 	if (code == 57)
 	{
-		all->game->writed[line][all->game->writed_index] = '(';
-        all->game->writed[line][all->game->writed_index + 1] = '_';
-        all->game->writed[line][all->game->writed_index + 2] = '\0';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), (30 + (5 * 20)) - 10);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->game->writed[line]);
-		all->game->writed_index++;
+		all->terminal->writed[line][all->terminal->writed_index] = '(';
+        all->terminal->writed[line][all->terminal->writed_index + 1] = '_';
+        all->terminal->writed[line][all->terminal->writed_index + 2] = '\0';
+		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), (30 + (5 * 20)) - 10);
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[line]);
+		all->terminal->writed_index++;
 	}
 	if (code == 48)
 	{
-        all->game->writed[line][all->game->writed_index] = ')';
-        all->game->writed[line][all->game->writed_index + 1] = '_';
-        all->game->writed[line][all->game->writed_index + 2] = '\0';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 11 + ((all->game->writed_index) * 6), (30 + (5 * 20)) - 10);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->game->writed[line]);
-		all->game->writed_index++;
+        all->terminal->writed[line][all->terminal->writed_index] = ')';
+        all->terminal->writed[line][all->terminal->writed_index + 1] = '_';
+        all->terminal->writed[line][all->terminal->writed_index + 2] = '\0';
+		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 11 + ((all->terminal->writed_index) * 6), (30 + (5 * 20)) - 10);
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[line]);
+		all->terminal->writed_index++;
 	}
 }
 
@@ -982,55 +1032,56 @@ void	put_string_on_terminal(t_all *all, char x, int line, int line_index)
 	mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 0, 10);
 	while (count < 5)
 	{
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + ((count) * 20), 16711680, all->game->writed[line - 4 + count]);
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + ((count) * 20), 16711680, all->terminal->writed[line - 4 + count]);
 		count++;
 	}
 }
 
 void	switch_strings(t_all *all, int keycode, int line)
 {
-	int	index;
-	int	focused;
-	int flag;
+	int	index2;
+	// int	focused;
 
-	flag = 1;
-	index = 0;
-	if (all->states->swifting_strings == 0)
+	index2 = 0;
+	if (all->states->swifting_strings == 0 && keycode == 65362)
 	{
-		while (all->game->writed[line][index])
+		while ((all->terminal->writed[line][all->terminal->current_line_size] != '_') && all->terminal->writed[line][all->terminal->current_line_size])
 		{
-			all->game->writed[line + 1][index] = all->game->writed[line][index];
-			index++;
+			all->terminal->writed[line + 1][all->terminal->current_line_size] = all->terminal->writed[line][all->terminal->current_line_size];
+			all->terminal->current_line_size++;
 		}
-		all->game->writed[line + 1][index] = '\0';
+		// all->terminal->writed[line + 1][all->terminal->current_line_size] = '\0';
 		all->states->swifting_strings = 1;
-		index = 0;
 	}
-	if ((keycode == 65362) && (all->game->string_focused > 5))
-		all->game->string_focused--;
-	else if ((keycode == 65364) && (all->game->string_focused < line))
-		all->game->string_focused++;
-	focused = all->game->string_focused;
-	if (focused != line)
+	
+	if ((keycode == 65362) && (all->terminal->string_focused > 5))
 	{
-		while (all->game->writed[focused][index] && (index < 28))
-		{
-			if (flag == 1)
-			{
-				flag = 0;
-				printf("COPIANDO A STRING\n\n");
-			}
-			all->game->writed[line][index] = all->game->writed[focused][index];
-			index++;
-		}
+		all->terminal->string_focused--;
+		if (all->terminal->string_focused == line && (all->terminal->string_focused > 5))
+			all->terminal->string_focused--;
+		while ((all->terminal->writed[all->terminal->string_focused][0] != 'c') && (all->terminal->string_focused > 5))
+			all->terminal->string_focused--;
 	}
-	else if (focused == line)
-		line++;
-	all->game->writed[line][index] = '\0';
-	all->game->writed_index = index;
-	printf("Focused: %d\nLine: %d\n", all->game->string_focused, line);
+	else if ((keycode == 65364) && (all->terminal->string_focused < line))
+	{
+		all->terminal->string_focused++;
+		if (all->terminal->string_focused == line && all->terminal->string_focused < (line + 1))
+			all->terminal->string_focused++;
+		while ((all->terminal->writed[all->terminal->string_focused][0] != 'c') && all->terminal->string_focused < (line))
+			all->terminal->string_focused++;
+	}
+	// focused = all->terminal->string_focused;
+	while (all->terminal->writed[all->terminal->string_focused][index2] && (index2 < 28))
+	{
+		all->terminal->writed[line][index2] = all->terminal->writed[all->terminal->string_focused][index2];
+		index2++;
+	}
+	all->terminal->writed[line][index2] = '\0';
+	all->terminal->writed_index = index2;
+	printf("INDEX 1 AQUI---------------->>>: %d\n\n", all->terminal->current_line_size);
+	printf("Focused: %d\nLine: %d\n", all->terminal->string_focused, line);
 	mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 0, (30 + (5 * 20)) - 10);
-	mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->game->writed[line]);
+	mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[line]);
 }
 				
 // void	reset_terminal_lines(t_all *all)
@@ -1046,62 +1097,94 @@ void	switch_strings(t_all *all, int keycode, int line)
 // 	}
 // }
 
+void	put_pcnumber_on_terminal(t_all *all, int line)
+{
+	int	index;
+
+	index = 0;
+	all->terminal->writed_index = 0;
+	while (all->terminal->user_pc_number[all->terminal->writed_index])
+	{
+		all->terminal->writed[line][all->terminal->writed_index] = all->terminal->user_pc_number[index];
+		index++;
+		all->terminal->writed_index++;
+	}
+	all->terminal->writed[line][(all->terminal->writed_index)++] = ' ';
+	all->terminal->writed[line][all->terminal->writed_index] = '\0';
+}
+
+
 int new_window_key_pressed(int keycode, void *arg)
 {
 	t_all *all;
-	static int	line = 5;
 
-	printf("key pressed: %d\n", keycode);
+	// printf("key pressed: %d\n", keycode);
 	all = (t_all *)arg;
-	// static int	line = 10;
+	printf("Linha escrita: %s\nNumero da linha: %d\n\n\n", all->terminal->writed[all->terminal->writed_line], all->terminal->writed_line);
+	// static int	all->terminal->writed_line = 10;
 	// static int	column = 30;
 	if (keycode == 65505 || keycode == 65506)
 		all->states->key_shift = 1;
 	if (keycode == 65507 || keycode == 65508)
 		all->states->key_ctrl = 1;
-	if ( (all->game->writed_index < 27) && all->states->key_shift == 1 && (keycode == 57 || keycode == 48))
-		put_shift_character(all, keycode, line);
+	if ( (all->terminal->writed_index < 27) && all->states->key_shift == 1 && (keycode == 57 || keycode == 48))
+		put_shift_character(all, keycode, all->terminal->writed_line);
 	else if ((keycode == 65362) || (keycode == 65364))
-		switch_strings(all, keycode, line);
-    else if ((all->game->writed_index < 27) && (all->states->key_shift == 0)  && (all->states->key_ctrl == 0) && 
-		((keycode >= 0 && keycode <= 25) || (keycode >= 97 && keycode <= 122) || (keycode == 32) || (keycode >= 48 && keycode <= 57)))
+		switch_strings(all, keycode, all->terminal->writed_line);
+    else if ((all->terminal->writed_index < 27) && (all->states->key_shift == 0)  && (all->states->key_ctrl == 0) && 
+		((keycode >= 0 && keycode <= 25) || (keycode >= 97 && keycode <= 122) || (keycode == 32) || (keycode >= 48 && keycode <= 57)
+		|| (keycode == 46) || (keycode == 47)))
 	{
-        all->game->writed[line][all->game->writed_index] = (char)keycode;
-        all->game->writed[line][all->game->writed_index + 1] = '_';
-        all->game->writed[line][all->game->writed_index + 2] = '\0';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), (30 + (5 * 20)) - 10);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->game->writed[line]);
-		all->game->writed_index++;
+		// insert_pcnumber(all, all->terminal->writed_line);
+        all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index] = (char)keycode;
+        all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index + 1] = '_';
+        all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index + 2] = '\0';
+		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), (30 + (5 * 20)) - 10);
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[all->terminal->writed_line]);
+		all->terminal->writed_index++;
+		// all->states->swifting_strings = 0;
 	}
-	else if (keycode == 65288)
+	else if (keycode == 65288 && all->terminal->writed_index > all->terminal->pc_number_size)
 	{
-		all->game->writed[line][all->game->writed_index] = '\0';
-		if (all->game->writed_index > 0)
-			all->game->writed_index--;
-		all->game->writed[line][all->game->writed_index] = '_';
-		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), (30 + (5 * 20)) - 10);
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->game->writed[line]);
+		all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index] = '\0';
+		if (all->terminal->writed_index > 0)
+			all->terminal->writed_index--;
+		all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index] = '_';
+		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), (30 + (5 * 20)) - 10);
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[all->terminal->writed_line]);
 	}
 	// if (keycode == 65307)
     else if (keycode == 65293)
 	{
 		// if (all->states->terminal_hook_flag == 1)
 		// 	all->states->terminal_hook_flag = 0;
-		check_message(all, line);
-		// all->game->writed_index--;
-		// mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), (30 + (line * 20)) - 10);
-		printf("Line no mini-terminal %d\n", line);
-		// all->game->writed[line][all->game->writed_index] = '_';
-		all->game->writed[line][all->game->writed_index] = '\0';
-		put_string_on_terminal(all, 'x', line, 0);
-		line++;
-		if (line >= 20)
-			line = 5;
-		all->game->string_focused = line;
-		all->game->writed_index = 0;
+		check_message(all, &all->terminal->writed_line);
+		// all->terminal->writed_index--;
+		// mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), (30 + (all->terminal->writed_line * 20)) - 10);
+		// printf("all->terminal->writed_line no mini-terminal %d\n", all->terminal->writed_line);
+		// all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index] = '_';
+		all->terminal->writed[all->terminal->writed_line][all->terminal->writed_index] = '\0';
+		all->terminal->writed[all->terminal->writed_line + 1][all->terminal->writed_index] = '\0';
+		put_string_on_terminal(all, 'x', all->terminal->writed_line, 0);
+		all->terminal->writed_line++;
+		if (all->terminal->writed_line >= 20)
+			all->terminal->writed_line = 5;
+		all->terminal->string_focused = all->terminal->writed_line;
+		all->terminal->current_line_size = 0;
+		all->terminal->writed_index = 0;
 		all->states->swifting_strings = 0;
-		// mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), (30 + (line * 20)) - 10);
-		// mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (line * 20), 16711680, all->game->writed);
+		// int	teste;
+		// teste = (compare_message("ls", all->terminal->writed[(all->terminal->writed_line)], 2));
+		// printf("RESULTADO DO COMPARE COM LS: %d\n\n", teste);
+		//8
+		//&& ((compare_message("ls", all->terminal->writed[(all->terminal->writed_line) - 1], 2)) != 0)
+		if (all->terminal->writed_index == 0)
+		{
+			put_pcnumber_on_terminal(all, all->terminal->writed_line);
+			mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[all->terminal->writed_line]);
+		}
+		// mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), (30 + (all->terminal->writed_line * 20)) - 10);
+		// mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (all->terminal->writed_line * 20), 16711680, all->terminal->writed);
 		// usleep(10000);
 		// else if (all->states->terminal_hook_flag == 0)
 		// {
@@ -1109,7 +1192,7 @@ int new_window_key_pressed(int keycode, void *arg)
 	}
 	if (all->states->key_ctrl == 1 && keycode == 99)
 	{
-		all->game->writed_index = 0;
+		all->terminal->writed_index = 0;
 		all->states->terminal = 0;
 		all->states->key_enter = 0;
 		all->states->key_ctrl = 0;
@@ -1117,7 +1200,8 @@ int new_window_key_pressed(int keycode, void *arg)
 		all->states->key_d = 0;
 		all->states->key_s = 0;
 		all->states->key_w = 0;
-		line = 5;
+		all->terminal->writed_line = 5;
+		all->terminal->string_focused = all->terminal->writed_line;
 		mlx_destroy_window(all->mlx, all->window_terminal);
 		usleep(1000);
 		all->window_terminal = NULL;
@@ -1141,21 +1225,21 @@ int new_window_key_pressed(int keycode, void *arg)
 //     if ((keycode >= 0 && keycode <= 25) || (keycode >= 97 && keycode <= 122) || (keycode == 32)
 // 	|| (keycode >= 48 && keycode <= 57))
 // 	{
-//         all->game->writed[all->game->writed_index] = (char)keycode;
-//         all->game->writed[all->game->writed_index + 1] = '_';
-//         all->game->writed[all->game->writed_index + 2] = '\0';
-// 		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), line);
-// 		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
-// 		all->game->writed_index++;
+//         all->terminal->writed[all->terminal->writed_index] = (char)keycode;
+//         all->terminal->writed[all->terminal->writed_index + 1] = '_';
+//         all->terminal->writed[all->terminal->writed_index + 2] = '\0';
+// 		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), line);
+// 		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->terminal->writed);
+// 		all->terminal->writed_index++;
 // 	}
 // 	if (keycode == 65288)
 // 	{
-// 		all->game->writed[all->game->writed_index] = '\0';
-// 		if (all->game->writed_index > 0)
-// 			all->game->writed_index--;
-// 		all->game->writed[all->game->writed_index] = '_';
-// 		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->game->writed_index) * 6), 21);
-// 		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->game->writed);
+// 		all->terminal->writed[all->terminal->writed_index] = '\0';
+// 		if (all->terminal->writed_index > 0)
+// 			all->terminal->writed_index--;
+// 		all->terminal->writed[all->terminal->writed_index] = '_';
+// 		mlx_put_image_to_window(all->mlx, all->window_terminal, all->images->blank_letter->mlx_st, 10 + ((all->terminal->writed_index) * 6), 21);
+// 		mlx_string_put(all->mlx, all->window_terminal, 10, 30, 16711680, all->terminal->writed);
 // 	}
 // 	// if (keycode == 65307)
 // 	if (keycode == 65293)
@@ -1165,8 +1249,8 @@ int new_window_key_pressed(int keycode, void *arg)
 // 		else if (all->states->terminal_hook_flag == 0)
 // 		{
 // 			check_message(all);
-// 			all->game->writed_index = 0;
-// 			all->game->writed[all->game->writed_index] = '\0';
+// 			all->terminal->writed_index = 0;
+// 			all->terminal->writed[all->terminal->writed_index] = '\0';
 // 			all->states->terminal = 0;
 // 			all->states->key_enter = 0;
 // 			all->states->key_a = 0;
@@ -1192,7 +1276,7 @@ void open_terminal(t_all *all)
     {
 		// all->window2 = mlx_new_window(all->mlx, 160, 160, "TERMINAL");
 		// usleep(100000);
-		all->window_terminal = mlx_new_window(all->mlx, 180, 140, "TERMINAL");
+		all->window_terminal = mlx_new_window(all->mlx, 180, 140, all->terminal->user_name);
 		// mlx_key_hook(all->window_terminal, key_hook, all);
 		mlx_hook(all->window_terminal, 2, 1L<<0, new_window_key_pressed, all);
 		mlx_hook(all->window_terminal, 3, 1L<<1, new_window_key_released, all);
@@ -1201,6 +1285,14 @@ void open_terminal(t_all *all)
 		// 	all->states->terminal_hook_flag = 0;
 		// }
         // mlx_hook(all->window_terminal, 2, 1L<<0, key_hook, all);
+
+		
+		if (all->terminal->writed_index == 0)
+		{
+			put_pcnumber_on_terminal(all, all->terminal->writed_line);
+			mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 16711680, all->terminal->writed[all->terminal->writed_line]);
+		}
+			
         mlx_string_put(all->mlx, all->window_terminal, 10, 10, 16711680, "Comand:\n");
     }
 }
@@ -1235,21 +1327,48 @@ int game_loop(void *arg)
     //     mlx_hook(all->window_terminal, 2, 1L<<0, key_hook, all); // key press
     //     all->states->terminal = 0;
     // }
-
     if ((all->states->key_a != 0 || all->states->key_w != 0 || 
          all->states->key_s != 0 || all->states->key_d != 0) && all->states->terminal == 0)
     {
         callback(1, all);
         update_background(all->images->letters_sheet, all->images->player, all->images->grass, 1, 6, all->game);
 		check_player_range(all, '0');
-        if (all->game->shadow == 1)
-			mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
-        mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
-        mlx_do_sync(all->mlx);
-        usleep(all->game->usleep);
+		
     }
+	update_game(all);                                               
 
+	if (all->game->shadow == 1)
+		mlx_put_image_to_window(all->mlx, all->window, all->images->exit->mlx_st, all->play->p_pixel_column, all->play->p_pixel_line);
+	mlx_put_image_to_window(all->mlx, all->window, all->images->player->mlx_st, all->game->element[indexor("P")].px_column, all->game->element[indexor("P")].px_line);
+	mlx_do_sync(all->mlx);
+	usleep(all->game->usleep);
     return 0;
+}
+//insert_pcnumber
+void	get_username_and_pcnumber(t_all *all)
+{
+	int	fd;
+	int	size;
+
+	size = 0;
+	fd = open("./maps/user_name.ber", O_RDONLY);
+	all->terminal->user_name = getnextline(fd);
+	printf("passou aqui\n\n\n\n");
+	if (!all->terminal->user_name)
+		all->terminal->user_name = "TERMINAL";
+	close(fd);
+	fd = open("./maps/computer_number.ber", O_RDONLY);
+	all->terminal->user_pc_number = getnextline(fd);
+	all->states->pc_number = 1;
+	while(all->terminal->user_pc_number[size])
+		size++;
+	all->terminal->pc_number_size = size + 1;
+	if (!all->terminal->user_pc_number)
+	{
+		all->terminal->user_pc_number = "comand: ";
+		all->terminal->pc_number_size = size + 1;
+		all->states->pc_number = 0;
+	}
 }
 
 void game_initializer(t_mapinfo *s_map, t_all *all)
@@ -1258,9 +1377,11 @@ void game_initializer(t_mapinfo *s_map, t_all *all)
 
     all->mlx = mlx_init();
     if (!all->mlx)
-        exit(1);
-
-    images = all_images_initiator(all->mlx, all);
+		exit(1);
+	images = all_images_initiator(all->mlx, all);
+	
+	get_username_and_pcnumber(all);
+	printf("passou aqui\n\n\n\n");
     all->images = images;
     all->window = mlx_new_window(all->mlx, s_map->line_len * 64, s_map->total_lines * 64, s_map->map_name);
     if (!all->window)
@@ -1325,7 +1446,11 @@ void	general_settings(t_all *all)
 		flag = 0;
 	}
 }
-
+	//writed_index;
+	//user_name;
+	//user_pc_number;
+	//string_focused;
+	//writed[500][28];
 int	main(int argc, char *argv[])
 {
 	t_all 			*all = malloc(sizeof(t_all));
@@ -1333,13 +1458,16 @@ int	main(int argc, char *argv[])
 	t_mapinfo		*s_map = malloc(sizeof(t_mapinfo));
 	t_gameinfo		*s_game = malloc(sizeof(t_gameinfo));
 	t_states		*states = malloc(sizeof(t_states));
+	t_terminalinfo 	*terminal = malloc(sizeof(t_terminalinfo));
 
 	if (argc != 2)
 		return (1);
 	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
 	*s_play = (t_playerinfo){0, 0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
-	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, {{0}}};
-	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+	*terminal = (t_terminalinfo){0, 0, 5, 0, 0, 0, 5, {{0}}};
+	all->terminal = terminal;
 	all->map = s_map;
 	all->play = s_play;
 	all->game = s_game;
@@ -1382,7 +1510,7 @@ int	main(int argc, char *argv[])
 	// printf("EU AQUI------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 	if (!check_all_paths(s_map, s_play, s_game, states))
 		return (1);
-	write(1, "teste123", 5);
+	// write(1, "teste123", 5);
 	if (!check_map_size(all))
 		return (1);
 	game_initializer(s_map, all);
@@ -1391,10 +1519,10 @@ int	main(int argc, char *argv[])
 //e_linefree_m
 
 // COMANDO PRA PEGAR O USER DA PESSOA e colocar num novo arquivo local
-// name=$(cd /home && ls -l | awk '{print $3}' | tail -1) && echo $name >> ./user_name.txt
+// name=$(ls -l | awk '{print $3}' | tail -1) && echo $name >> ./maps/user_name.ber
 
 // COMANDO PRA PEGAR O COMPUTADOR DA PESSOA e colocar num novo arquivo local
-//echo $HOST | cut -d'.' -f1 > ./computer_number.txt
+// echo $HOST | cut -d'.' -f1 > ./maps/computer_number.ber
 
 // compilar com
 // cc -Wall -Wextra -Werror -I libft -I MiniLibX/minilibx-linux so_long.c libft/parcing.c libft/utils.c libft/getnextline.c -L MiniLibX/minilibx-linux -lmlx -lXext -lX11 -lm

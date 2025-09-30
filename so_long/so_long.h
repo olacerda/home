@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   so_long.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 21:54:15 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/29 19:44:45 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/09/30 07:21:46 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #ifndef SO_LONG_H
 # define SO_LONG_H
@@ -32,6 +32,8 @@ typedef struct s_states
 	int	undefined_behavior;
 	int	swifting_strings;
 	int bonus;
+	int	letters_compiled;
+	int	pc_number;
 } t_states;
 
 typedef struct s_element
@@ -56,11 +58,20 @@ typedef struct s_gameinfo
 	int		shadow;
 	char	*real_elements;
 	int		elements_quantity;
-	int		writed_index;
 	int		memory;
+} t_gameinfo;
+
+typedef struct s_terminalinfo
+{
+	int		pc_number_size;
+	int		current_line_size;
+	int		writed_line;
+	int		writed_index;
+	char	*user_name;
+	char	*user_pc_number;
 	int		string_focused;
 	char	writed[500][28];
-} t_gameinfo;
+} t_terminalinfo;
 
 typedef struct s_playerinfo
 {
@@ -142,6 +153,7 @@ typedef struct s_all
 	t_all_images	*images;
 	t_gameinfo		*game;
 	t_states		*states;
+	t_terminalinfo	*terminal;
 	void			*mlx;
 	void			*window;
 	void			*window_terminal;
@@ -174,7 +186,9 @@ t_all_images	*all_images_initiator(void *mlx, t_all *all);
 void			color_image(t_image *image, int flag);
 void			update_background(t_sheet *src, t_image *dst, t_image *background, int sprite_column, int sprite_line, t_gameinfo *game);
 void			put_images(t_all *all, t_mapinfo *map, t_all_images *images);
-void			check_bonus(t_all *all, char element, int line, int index);
+// void			check_bonus(t_all *all, char element, int line, int index);
+void			put_letter(t_all *all);
+
 
 void			game_initializer(t_mapinfo *s_map, t_all *all);
 int				update_position(void *arg);
@@ -202,13 +216,15 @@ int				indexor(char *x);
 
 void			general_settings(t_all *all);
 void 			open_terminal(t_all *all);
-int				compare_message(char *string1, char *string2, int limit);
-void			check_message(t_all *all, int line);
+int				compare_message(t_all * all, char *string1, char *string2, int limit);
+void			check_message(t_all *all, int *line);
 void			put_shift_character(t_all *all, int	code, int line);
 int 			new_window_key_pressed(int keycode, void *arg);
 int				new_window_key_released(int keycode, void *arg);
 void			put_string_on_terminal(t_all *all, char x, int line, int line_index);
 void			switch_strings(t_all *all, int keycode, int line);
+void			get_username_and_pcnumber(t_all *all);
+void			put_pcnumber_on_terminal(t_all *all, int line);
 
 
 #endif
