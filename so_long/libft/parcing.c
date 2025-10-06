@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parcing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
+/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/05 00:32:16 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/09/30 03:26:22 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/06 19:08:47 by olacerda         ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "utils.h"
 
@@ -22,17 +22,16 @@ int	check_rectangle(t_mapinfo *s_map)
 	if (!(*s_map->map) || !s_map->map)
 		return (0);
 	line_1_size = strlength(s_map->map[line++]);
-	printf("\n\nCHECK RECTANGLE\n\nmap1len: %d\n", line_1_size);
+	if (!line_1_size)
+		return (0);
 	while (line < s_map->total_lines|| s_map->map[line] != NULL)
 	{
 		line_size = strlength(s_map->map[line]);
-		printf("mapslens: %d\n", line_size);
-		if (line_size != line_1_size)
+		if (line_size != line_1_size || !line_size)
 			return (0);
 		line++;
 	}
 	s_map->line_len = line_1_size;
-	printf("\nLine_Len %d\n", s_map->line_len);
 	return (1);
 }
 
@@ -49,54 +48,28 @@ int	check_close_walls(t_mapinfo *s_map)
 	{
 		if(s_map->map[line][index++] != '1')
 			return (0);
-		if (line == 0 && (s_map->map[line][index] == '\n' || !s_map->map[line][index]))
+		if (line == 0 && (s_map->map[line][index] == '\n' || 
+			!s_map->map[line][index]))
 		{
 			index = 0;
 			line = (s_map->total_lines - 1);
 		}
 	}
 	line = 1;
-	while(s_map->map[line] != NULL)
-	{
-		if ((s_map->map[line][0] != '1') || (s_map->map[line][s_map->line_len - 1] != '1'))
-			return (0);
-		line++;		
-	}
+	while(s_map->map[++line] != NULL)
+		if ((s_map->map[line][0] != '1') || 
+			(s_map->map[line][s_map->line_len - 1] != '1'))
+			return (0);	
 	return (1);
 }
 
-// void create_elements(t_gameinfo *s_game)
-// {
-// 	char	*elements;
-// 	int		*count_elements;
-// 	int		index;
-// 	char	*string;
-
-// 	index = 0;
-// 	string = "PEC10RXITO";
-// 	elements = malloc(11 * sizeof(char));
-// 	count_elements = malloc(11 * (sizeof(int)));
-// 	if (!elements || !count_elements)
-// 		return ;
-// 	while (index < 11)
-// 	{
-// 		elements[index] = string[index];
-// 		count_elements[index] = 0;
-// 		index++;
-// 	}
-// 	s_game->elements = elements;
-// 	s_game->count_elements = count_elements;
-// }
-// real_elements
 void create_elements(t_gameinfo *s_game)
 {
 	t_element	*elements;
-	// int		*count_elements;
 	int		index;
 	char	*string;
 
 	index = 0;
-	// string = "PEC10RXITO";
 	string = s_game->real_elements;
 	elements = malloc((s_game->elements_quantity) * sizeof(t_element));
 	if (!elements)
@@ -109,6 +82,8 @@ void create_elements(t_gameinfo *s_game)
 		elements[index].column = 0;
 		elements[index].px_column = 0;
 		elements[index].px_line = 0;
+		elements[index].mlx = 0;
+		elements[index].img = 0;
 		index++;
 	}
 	s_game->element = elements;
@@ -127,13 +102,6 @@ void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 		column = -1;
 		while ((s_map->map[line][++column]) && s_map->map[line][column] != '\n')
 		{
-			// if (s_map->map[line][column] == 'P')
-			// 	*s_play = (t_playerinfo){line, column, 0, 0, 0, {0}, line * 64, column * 64, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
-			// if (s_map->map[line][column] == 'E')
-			// {
-			// 	s_game->e_line = line;
-			// 	s_game->e_column = column;
-			// }
 			index = 0;
 			while ((s_map->map[line][column] != s_game->element[index].charr) 
 				&& (s_game->element[index].charr != 'O'))
@@ -142,7 +110,7 @@ void	count_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
 		}
 	}
 }
-//indexor
+
 void	get_element_positions(t_gameinfo *game, t_mapinfo *map)
 {
 	int	line;
@@ -156,10 +124,8 @@ void	get_element_positions(t_gameinfo *game, t_mapinfo *map)
 		while ((map->map[line][column] != '\n') && (map->map[line][column] != '\0'))
 		{
 			index = 0;
-			// write(1, "AQUI 1\n", 7);
 			while ((game->element[index].charr != map->map[line][column]) && (game->element[index].charr != 'O'))
 			{
-				// write(1, "AQUI 2\n", 7);
 				index++;				
 			}
 			game->element[index].line = line;
@@ -171,31 +137,6 @@ void	get_element_positions(t_gameinfo *game, t_mapinfo *map)
 		line++;
 	}
 }
-// ATUALIZAR CHECK ELEMENTS PARA CONTAR COM "Y" TAMBEM
-// int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
-// {
-// 	int	index;
-
-// 	index = 0;
-// 	create_elements(s_game);
-// 	count_elements(s_map, s_play, s_game);
-// 	get_element_positions(s_game, s_map);
-// 	while(s_game->element[index].charr != '\0')
-// 	{
-// 		if ((s_game->element[index].charr == 'P' || s_game->element[index].charr == 'E' || 
-// 			s_game->element[index].charr == 'R' || s_game->element[index].charr == 'X' || 
-// 			s_game->element[index].charr == 'I' || s_game->element[index].charr == 'T')
-// 			&& s_game->element[index].count > 1)
-// 			return (0);
-// 		if (s_game->element[index].charr == 'C' && s_game->element[index].count < 1)
-// 			return (0);
-// 		if (s_game->element[index].charr == 'O' && s_game->element[index].count > 0)
-// 			return (0);
-// 		index++;
-// 	}
-// 	return (1);
-// }
-
 
 int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, t_states *states)
 {
@@ -206,7 +147,7 @@ int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, t
 	count_elements(s_map, s_play, s_game);
 	get_element_positions(s_game, s_map);
 	states->bonus = 1;
-	while(s_game->element[++index].charr != '\0')
+	while(++index < s_game->elements_quantity)
 	{
 		if ((s_game->element[index].charr == 'R' || s_game->element[index].charr == 'X' ||
 			s_game->element[index].charr == 'I' || s_game->element[index].charr == 'T' ||
@@ -224,6 +165,33 @@ int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, t
 	return (1);
 }
 
+// int	check_elements(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, t_states *states)
+// {
+// 	int	index;
+
+// 	index = -1;
+// 	create_elements(s_game);
+// 	count_elements(s_map, s_play, s_game);
+// 	get_element_positions(s_game, s_map);
+// 	states->bonus = 1;
+// 	while(s_game->element[++index].charr != '\0')
+// 	{
+// 		if ((s_game->element[index].charr == 'R' || s_game->element[index].charr == 'X' ||
+// 			s_game->element[index].charr == 'I' || s_game->element[index].charr == 'T' ||
+// 			s_game->element[index].charr == 'Y')
+// 			&& s_game->element[index].count != 1)
+// 			states->bonus = 0;
+// 		if ((s_game->element[index].charr == 'P' && s_game->element[index].charr != 'E')
+// 			&& s_game->element[index].count != 1)
+// 			return (0);
+// 		if (s_game->element[index].charr == 'C' && s_game->element[index].count < 1)
+// 			return (0);
+// 		if (s_game->element[index].charr == 'O' && s_game->element[index].count > 0)
+// 			return (0);
+// 	}
+// 	return (1);
+// }
+
 void	copy_map(t_mapinfo *map, char **copy, char *ignore)
 {
 	int	line;
@@ -231,7 +199,6 @@ void	copy_map(t_mapinfo *map, char **copy, char *ignore)
 	int	idx_ignore;
 
 	line = 0;
-	printf("Copiou o mapa, colocando '0' no lugar de: %s\n\n", ignore);
 	while (map->map[line] != NULL)
 	{
 		index = 0;
@@ -248,14 +215,11 @@ void	copy_map(t_mapinfo *map, char **copy, char *ignore)
 			index++;
 		}
 		copy[line][index] = '\0';
-		// printf("dentro de COPY map: %s", copy[line]);
-		// printf("dentro de ORIGINAL: %s", map->map[line]);
 		line++;
 	}
-	line = -1;
-	while (copy[++line] != NULL)
-		printf("Copy map -> %s\n", copy[line]);
-	// map->map[line] = NULL;
+	// line = -1;
+	// while (copy[++line] != NULL)
+	// 	printf("Copy map -> %s\n", copy[line]);
 }
 
 int	path_to_colectable(char **map, int	line, int column, char	to_colect, int *count)
@@ -269,7 +233,6 @@ int	path_to_colectable(char **map, int	line, int column, char	to_colect, int *co
 	if (map[line][column] == to_colect)
 	{
 		(*count)--;
-		printf("Coletavel: %c  Quantidade faltando: %d\n", to_colect, *count);
 	}
 	if (*count == 0)
 		return (1);
@@ -293,32 +256,14 @@ int	exit_colectables_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char
 	char	target = s_game->element[indexor(&(elements[index]))].charr;
 	int	count = s_game->element[indexor(&(elements[index]))].count;
 	static	char ignore[3] = {0, 0, '\0'};
-	// int	line = 0;
 
-	// ignore [2] = '\0';
 	path = 0;
-	printf("\nExit and Colectables Path----------------------------->>>>>>>>>>\n\n");
 	while (elements[index] != '\0')
 	{
-		// write(1, "\n\n\n", 3);
-		// while (map[line] != NULL)
-		// {
-		// 	// printf("COPY-> %s", map[line]);
-		// 	line++;
-		// }
-		// line = 0;
-		// write(1, "\n\n\n", 3);
-		// while (s_map->map[line] != NULL)
-		// {
-		// 	// printf("ORIGINAL-> %s", map[line]);
-		// 	line++;
-		// }
-		// write(1, "\n\n\n", 3);
 		target = s_game->element[indexor(&(elements[index]))].charr;
 		ignore[index] = target;
 		count = s_game->element[indexor(&(elements[index]))].count;
 		path = path_to_colectable(map, s_game->element[indexor("P")].line, s_game->element[indexor("P")].column, target, &count);
-		printf("Path do char:%c  Quantidade: %d ->> %d\n\n", s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
 		copy_map(s_map, map, ignore);
 		if (!path)
 			return (0);
@@ -336,14 +281,7 @@ int	letters_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *element
 	int	count = s_game->element[indexor(&(elements[index]))].count;
 	static char ignore[6] = {0, 0, 0, 0, 0, '\0'};
 
-	printf("\n\n ------------------------------------>>>>>>>>>>>>Letters path\n");
 	path = 0;
-	// path = path_to_colectable(map, s_game->element[indexor("P")].line, s_game->element[indexor("P")].column, &target, &count);
-	// ignore[0] = s_game->element[indexor("P")].charr;
-	// copy_map(s_map, map, ignore);
-	// printf("Path to char:%c to --> %c Quantidade: %d ->> %d\n\n", s_game->element[indexor("P")].charr, s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
-	// if (!path)
-	// 	return (0);
 	while (elements[index] != 'T')
 	{
 		target = s_game->element[indexor(&(elements[index + 1]))].charr;
@@ -351,7 +289,6 @@ int	letters_path(t_mapinfo *s_map, t_gameinfo *s_game, char **map, char *element
 		count = s_game->element[indexor(&(elements[index]))].count;
 		path = path_to_colectable(map, s_game->element[indexor(&(elements[index]))].line, s_game->element[indexor(&(elements[index]))].column, target, &count);
 		copy_map(s_map, map, ignore);
-		printf("Path to char:%c  to ->> %c  Quantidade: %d ->> %d\n\n", s_game->element[indexor(&(elements[index]))].charr, s_game->element[indexor(&(elements[index + 1]))].charr, s_game->element[indexor(&(elements[index]))].count, path);
 		if (!path)
 			return (0);
 		index++;
@@ -364,49 +301,22 @@ int	check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game, 
 	char **map;
 	int	path;
 
-	write(1, "test123\n", 8);
 	(void)s_play;
 	map = create_map(s_map);
 	path = exit_colectables_path(s_map, s_game, map, "CE");
-	printf("***   Primeiro path: %d   ***\n\n\n", path);
 	if (!path)
 		return (0);
 	if (states->bonus == 1)
 	{
 		path = letters_path(s_map, s_game, map, "YRXIT");
-		printf("***   Segundo path: %d   ***\n\n\n\n", path);
 		if (!path)
 			return (0);	
 	}
 	free_map(map);
-	// printf("\nplayer position:\n\n\nLine: %d\nColumn: %d\n\n\n", s_play->line, s_play->column);
-	// printf("\nNOVO BOROGODOOOOOOOOOO\n\n\nLine: %d\nColumn: %d\n\n\n", s_play->line, s_play->column);
 	return (path);
 }
 
-// int	check_all_paths(t_mapinfo *s_map, t_playerinfo *s_play, t_gameinfo *s_game)
-// {
-// 	// char **map;
-// 	int	line;
-// 	int	column;
-// 	int	path;
-// 	int	to_colect[2];
-
-// 	to_colect[0] = s_game->element[2].count;
-// 	to_colect[1] = 1;
-// 	line = s_game->element[indexor("P")].line;
-// 	column = s_game->element[indexor("P")].column;
-// 	printf("\nplayer position:\n\n\nLine: %d\nColumn: %d\n\n\n", s_play->line, s_play->column);
-// 	// map = create_map(s_map);
-// 	printf("\nNOVO BOROGODOOOOOOOOOO\n\n\nLine: %d\nColumn: %d\n\n\n", s_play->line, s_play->column);
-// 	path = path_to_colectable(s_map->map, line, column, to_colect);
-// 	free_map(s_map);
-// 	s_map->map = create_map(s_map);
-// 	return (path);
-// }
-
-
-int	check_file_name(char *name)
+int	check_map_ber_type(char *name)
 {
 	char	*file_type;
 	int		f_index;

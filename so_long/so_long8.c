@@ -1,17 +1,17 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   so_long.c                                          :+:      :+:    :+:   */
+/*   so_long8.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/04 22:04:33 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/06 20:03:06 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/06 14:49:46 by olacerda         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
-#include "so_long.h"
-
+#include "so_long_header3.h"
+//printf
 int	count_lines(char *chosen_map)
 {
 	int	fd;
@@ -66,7 +66,7 @@ char	*get_map_adress(char *map_name)
 	int		name_length;
 
 	if (check_map_adrees_need(map_name) == 0)
-		return (map_name);
+	return (map_name);
 	if (!map_name)
 		return (NULL);
 	name_length = strlength(map_name);
@@ -85,23 +85,23 @@ char	*get_map_adress(char *map_name)
 	return (adress);
 }
 
-char **create_map(t_mapinfo *map)
+char **create_map(t_mapinfo *s_map)
 {
-	char	**matriz;
+	char	**map;
 	int		line;
 	int		fd;
 
-	fd = open(map->map_adress, O_RDONLY);
+	fd = open(s_map->map_adress, O_RDONLY);
 	if (fd < 0)
 		return (NULL);
-	matriz = malloc ((map->total_lines + 1) * sizeof(char *));
+	map = malloc ((s_map->total_lines + 1) * sizeof(char *));
 	if (!map)
 		return (close(fd), NULL);
 	line = -1;
-	while(++line < map->total_lines)
-		matriz[line] = getnextline(fd);
-	matriz[line] = NULL;
-	return (close(fd), matriz);
+	while(++line < s_map->total_lines)
+		map[line] = getnextline(fd);
+	map[line] = NULL;
+	return (close(fd), map);
 }
 
 void	free_map(char **map)
@@ -130,14 +130,10 @@ t_sheet *sheet_initiator(void *mlx, int	sprite_number)
 	if (sprite_number == 2)
 		sheet->st = mlx_xpm_file_to_image(mlx, 
 			"textures/let.xpm", &sheet->wide, &sheet->tall);
-	if (sprite_number == 3)
-		sheet->st = mlx_xpm_file_to_image(mlx,
-			"textures/terminal_art_1.xpm", &sheet->wide, &sheet->tall);
-	if (sprite_number == 4)
-		sheet->st = mlx_xpm_file_to_image(mlx, 
-			"textures/red_letters.xpm", &sheet->wide, &sheet->tall);
 	sheet->img = mlx_get_data_addr(sheet->st, &sheet->bpp, 
-		&sheet->sizeline, &sheet->endian);				
+		&sheet->sizeline, &sheet->endian);
+				
+	printf("teste se entrou\n\n\n");
 	return (sheet);
 }
 
@@ -154,19 +150,17 @@ t_image	*image_initiator(void *mlx, int size, char charr, t_element *elements)
 	image->wide = WIDE * size;
 	image->mlx_st = mlx_new_image(mlx, image->wide, image->tall);
 	if (charr != '\0')
-		elements[indexor(&charr)].mlx = image->mlx_st;
+		elements[indexor(&charr)].str = image->mlx_st;
 	if (!image->mlx_st)
 		return (NULL);
 	image->img = mlx_get_data_addr(image->mlx_st, &image->bpp, 
 		&image->sizeline, &image->endian);
-	if (charr != '\0')
-		elements[indexor(&charr)].img = image->img;
 	if (!image->img)
 		return (NULL);
 	return (image);
 }
 
-void	sheet_to_image2(t_sheet *src, t_image *dst, t_image *background, int nbr)
+void	sheet_to_image(t_sheet *src, t_image *dst, t_image *banana, int nbr)
 {
 	int	img_line;
 	int src_idx;
@@ -175,8 +169,8 @@ void	sheet_to_image2(t_sheet *src, t_image *dst, t_image *background, int nbr)
 	int	ints_per_line;
 
 	ints_per_line = ((src->bpp * dst->wide) / 32);
-	src_idx = ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide))) + 
-		((src->sizeline / 4) * ((nbr / (src->wide / dst->wide)) * dst->tall));
+	src_idx = ((dst->sizeline / 4) * (nbr % (5))) + 
+		((src->sizeline / 4) * ((nbr / (5)) * dst->tall));
 	img_line = -1;
 	dst_idx = 0;
 	while (++img_line < dst->tall)
@@ -184,8 +178,8 @@ void	sheet_to_image2(t_sheet *src, t_image *dst, t_image *background, int nbr)
 		count = -1;
 		while((++count < ints_per_line))
 		{
-			if (((int *)src->img)[src_idx] == 16777215)
-				((int *)dst->img)[dst_idx] = ((int *)background->img)[dst_idx];
+			if (((int *)src->img)[src_idx] == -16777216)
+				((int *)dst->img)[dst_idx] = ((int *)banana->img)[dst_idx];
 			else
 				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
 			dst_idx++;
@@ -195,76 +189,51 @@ void	sheet_to_image2(t_sheet *src, t_image *dst, t_image *background, int nbr)
 	}
 }
 
-void	sheet_to_image(t_sheet *src, t_image *dst, t_image *background, int nbr)
+t_background	*calculate_vars(t_all *all, t_sheet *src, int col, int line)
 {
-	int	img_line;
-	int src_idx;
-	int	dst_idx;
-	int	count;
-	int	ints_per_line;
+	t_background 	*var;
+	int				px_column;
+	int 			px_line;
 
-	ints_per_line = ((src->bpp * dst->wide) / 32);
-	src_idx = ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide))) + 
-		((src->sizeline / 4) * ((nbr / (src->wide / dst->wide)) * dst->tall));
-	img_line = -1;
-	dst_idx = 0;
-	while (++img_line < dst->tall)
-	{
-		count = -1;
-		while((++count < ints_per_line))
-		{
-			if (((int *)src->img)[src_idx] == -16777216 || ((int *)src->img)[src_idx] == 16777215)
-				((int *)dst->img)[dst_idx] = ((int *)background->img)[dst_idx];
-			else
-				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-			dst_idx++;
-			src_idx++;		
-		}
-		src_idx = src_idx + ((src->sizeline / 4) - (count));
-	}
-}
-
-t_background	*calculate_vars(t_all *all, t_sheet *src, t_image *dst, int nbr)
-{
-	static t_background	var;
-	int					px_column;
-	int 				px_line;
-
+	var = malloc(sizeof(t_background));
+	if (!var)
+		return (NULL);
 	px_column = all->game->element[indexor("P")].px_column;
 	px_line = all->game->element[indexor("P")].px_line;
-	var.grid_column = ((px_column / 64) * 64);
-	var.grid_line = ((px_line / 64) * 64);
-	var.difference_column = px_column - var.grid_column;
-	var.difference_line = px_line - var.grid_line;
-	var.ints_per_line = ((src->bpp * all->images->player->wide) / 32);
-	var.src_idx = ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide))) + 
-		((src->sizeline / 4) * ((nbr / (src->wide / dst->wide)) * dst->tall));
-	var.bg_line = var.difference_column;
-	var.bg_column = var.difference_line;
-	var.img_line = 0;
-	var.dst_idx = 0;
-	var.bg_idx = 0;
-	var.count = 0;
-	var.play = all->images->player->img;
-	return (&var);
+	var->grid_column = ((px_column / 64) * 64);
+	var->grid_line = ((px_line / 64) * 64);
+	var->difference_column = px_column - var->grid_column;
+	var->difference_line = px_line - var->grid_line;
+	var->ints_per_line = ((src->bpp * all->images->player->wide) / 32);
+	var->src_idx = ((all->images->player->sizeline / 4) * (col - 1)) + 
+		((src->sizeline / 4) * ((line - 1) * all->images->player->tall));
+	var->bg_line = var->difference_column;
+	var->bg_column = var->difference_line;
+	var->img_line = 0;
+	var->dst_idx = 0;
+	var->bg_idx = 0;
+	var->count = 0;
+	var->play = all->images->player->img;
+	var->grss = all->images->grass->img;
+	return (var);
 }
 
-void	update_bg(t_sheet *src, t_image *bg, t_all *all, int nbr)
+void	update_bg(t_sheet *src, t_all *all, int spr_column, int spr_line)
 {
-	static t_background *x;
+	t_background *x;
 
-	x = calculate_vars(all, src, all->images->player, nbr);
+	x = calculate_vars(all, src, spr_column, spr_line);
 	while ((x->img_line) < all->images->player->tall)
 	{
 		x->count = -1;
 		while (++(x->count) < x->ints_per_line)
 		{
-			x->bg_column = (x->difference_column + x->count) % WIDE;
-			x->bg_line = (x->difference_line + x->img_line) % TALL;
-			x->bg_idx = (x->bg_line * (all->images->grass->sizeline / 4))
-				+ x->bg_column;
+			x->bg_line = (x->difference_column + x->count) % TALL;
+			x->bg_column = (x->difference_line + x->img_line) % WIDE;
+			x->bg_idx = (x->bg_column * (all->images->grass->sizeline / 4))
+				 + x->bg_line;
 			if (((int *)src->img)[x->src_idx] == -16777216)
-				((int *)x->play)[x->dst_idx] = ((int *)bg->img)[x->bg_idx];
+				((int *)x->play)[x->dst_idx] = ((int *)x->grss)[x->bg_idx];
 			else
 				((int *)x->play)[x->dst_idx] = ((int *)src->img)[x->src_idx];
 			x->dst_idx++;
@@ -299,14 +268,6 @@ void	color_image(t_image *image, int	flag)
 	}
 }
 
-void	all_sheets_initiator(void *mlx, t_all_images *images)
-{
-	images->grass_wall_sheet = sheet_initiator(mlx, 1);
-	images->letters_sheet = sheet_initiator(mlx, 2);
-	images->terminal_sheet = sheet_initiator(mlx, 3);
-	images->red_letters_sheet = sheet_initiator(mlx, 4);
-}
-
 t_all_images	*all_images_initiator(void *mlx, t_all *all)
 {
 	t_all_images *images;
@@ -314,7 +275,8 @@ t_all_images	*all_images_initiator(void *mlx, t_all *all)
 	images = malloc(sizeof(t_all_images));
 	if (!images)
 		return (NULL);
-	all_sheets_initiator(mlx, images);
+	images->grass_wall_sheet = sheet_initiator(mlx, 1);
+	images->letters_sheet = sheet_initiator(mlx, 2);
 	images->R = image_initiator(mlx, 1, 'R', all->game->element);
 	images->X = image_initiator(mlx, 1, 'X', all->game->element);
 	images->I = image_initiator(mlx, 1, 'I', all->game->element);
@@ -328,8 +290,6 @@ t_all_images	*all_images_initiator(void *mlx, t_all *all)
 	images->blank_letter = image_initiator(mlx, 10, '\0', all->game->element);
 	images->player = image_initiator(mlx, 1, 'P', all->game->element);
 	images->background = image_initiator(mlx, 1, '\0', all->game->element);
-	images->number1 = image_initiator(mlx, 1, '\0', all->game->element);
-	images->number2 = image_initiator(mlx, 1, '\0', all->game->element);
 	all_images_fill_buffers(images);
 	return (images);
 }
@@ -338,17 +298,16 @@ void	all_images_fill_buffers(t_all_images *images)
 {
 	sheet_to_image(images->grass_wall_sheet, images->wall, NULL, 0);
 	sheet_to_image(images->grass_wall_sheet, images->grass, NULL, 1);
-	sheet_to_image(images->grass_wall_sheet, images->background, NULL, 1);
+	sheet_to_image(images->letters_sheet, images->background, images->grass, 25);
 	sheet_to_image(images->letters_sheet, images->player, images->grass, 25);
 	color_image(images->collectable, 501000);
 	color_image(images->exit, 0);
-	color_image(images->color, 0);
+	color_image(images->color, 16711680);
 	color_image(images->blank_letter, 0);
 	sheet_to_image(images->letters_sheet, images->R, images->grass, 14);
 	sheet_to_image(images->letters_sheet, images->X, images->grass, 33);
 	sheet_to_image(images->letters_sheet, images->I, images->grass, 18);
 	sheet_to_image(images->letters_sheet, images->T, images->grass, 29);
-	sheet_to_image(images->terminal_sheet, images->Y, images->grass, 0);
 }
 
 void	put_images(t_all *all, t_mapinfo *map, t_element *ele)
@@ -364,8 +323,8 @@ void	put_images(t_all *all, t_mapinfo *map, t_element *ele)
 		while(map->map[ln][++column] != '\n' && (column < map->line_len))
 		{
 			index = 0;
-			while (map->map[ln][column] != ele[index++].charr && index < all->game->elements_quantity)
-				mlx_put_image_to_window(all->mlx, all->window, ele[index].mlx,
+			while (map->map[ln][column] != ele[index++].charr)
+				mlx_put_image_to_window(all->mlx, all->window, ele[index].str,
 					column * 64, ln * 64);
 			if ((map->map[ln][column] == 'R' || map->map[ln][column] == 'X' ||
 				map->map[ln][column] == 'I' || map->map[ln][column] == 'T' ||
@@ -374,7 +333,7 @@ void	put_images(t_all *all, t_mapinfo *map, t_element *ele)
 			{
 				all->map->map[ln][column] = '0';
 				mlx_put_image_to_window(all->mlx, all->window, 
-					all->game->element[indexor("0")].mlx, column * 64, ln * 64);
+					all->game->element[indexor("0")].str, column * 64, ln * 64);
 			}
 		}
 	}
@@ -397,7 +356,7 @@ void	rebuild_current_map(t_all *all)
 			if (map[line][index] != 'P')
 			{
 				mlx_put_image_to_window(all->mlx, all->window, 
-					all->game->element[indexor(&(map[line][index]))].mlx, 
+					all->game->element[indexor(&(map[line][index]))].str, 
 						index * 64, line * 64);
 			}
 			index++;
@@ -420,7 +379,7 @@ void	put_letter(t_all *all, char *letters)
 		column = all->game->element[indexor(&(letters[index]))].column;
 		element = all->game->element[indexor(&(letters[index]))].charr;
 		all->map->map[line][column] = element;
-		img_mlx = all->game->element[indexor(&(letters[index]))].mlx;
+		img_mlx = all->game->element[indexor(&(letters[index]))].str;
 		column = column * WIDE;
 		line = line * TALL;
 		mlx_put_image_to_window(all->mlx, all->window, img_mlx, column, line);
@@ -433,15 +392,15 @@ void	update_images(t_all *all, int p_col, int p_line)
 {
 	int		col;
 	int		line;
-	void	*bg_mlx;
+	void	*gras_mlx;
 	void	*play_mlx;
 
 	play_mlx = all->images->player->mlx_st;
-	bg_mlx = all->images->background->mlx_st;
+	gras_mlx = all->images->grass->mlx_st;
 	col = all->game->element[indexor("P")].px_column;
 	line = all->game->element[indexor("P")].px_line;
 	if (all->game->shadow == 1)
-		mlx_put_image_to_window(all->mlx, all->window, bg_mlx, p_col , p_line);
+		mlx_put_image_to_window(all->mlx, all->window, gras_mlx, p_col, p_line);
 	mlx_put_image_to_window(all->mlx, all->window, play_mlx, col, line);
 }
 
@@ -475,29 +434,40 @@ void make_sound(long frequency)
     }
 }
 
+// void make_sound(long frequency)
+// {
+// 	static long time = 0;
+// 	static long bell_last = 0;
+
+// 	time = get_full_time();
+// 	if (bell_last == 0)
+// 		bell_last = time;
+// 	if (time - bell_last > frequency)
+// 	{
+// 		write(1, "\a", 1);
+// 		bell_last = time;
+// 	}
+// }
+
 void	check_letters_colected(t_all *all, char	element, int line, int column)
 {
 	int			index;
 	char *letters;
 
 	letters = "RXIT";
-	index = -1;
+	index = 0;
 	if (element == 'R' || element == 'X' || element == 'I' || element == 'T')
 	{
 		all->play->letter_colected[all->play->letters_colected_amount] = 
 			all->map->map[line][column];
 		all->play->letters_colected_amount++;
-		if (all->states->undefined_behavior == 1)
-		{
-			// all->game->ub_current_time -= 10;
-			display_ub_count(all->images, all->game, all);
-		}
 		if (all->play->letters_colected_amount > all->game->memory)
 			all->states->undefined_behavior = 1;
-		while (++index < all->play->letters_colected_amount)
+		while (index < all->play->letters_colected_amount)
 		{
 			if ((letters[index] != all->play->letter_colected[index]))
 				return ;
+			index++;
 		}
 	}
 	if (all->play->letters_colected_amount == 4)
@@ -547,7 +517,7 @@ int	check_hitbox(t_all *all, char element)
 		return (1);
 	return (0);
 }
-
+//elements_quantity
 void	update_player_range(t_all *all, int line, int column)
 {
 	char	**map;
@@ -556,7 +526,7 @@ void	update_player_range(t_all *all, int line, int column)
 	void	*element_buff;
 
 	map = all->map->map;
-	element_buff = all->game->element[indexor(&(map[line][column]))].mlx;
+	element_buff = all->game->element[indexor(&(map[line][column]))].str;
 	lin = line * WIDE;
 	col = column * TALL;
 	if (all->map->map[line][column] != '1')
@@ -599,6 +569,13 @@ void update_major_elements(t_all *all, int line, int column)
 		if (all->states->key_enter == 1)
 			all->states->terminal = 1;
 	}
+	if ((check_hitbox(all, 'E') == 1) && (all->states->won == 1))
+	{
+		all->states->full_colectables = 0;
+		mlx_clear_window(all->mlx, all->window);
+		mlx_destroy_window(all->mlx, all->window);
+		exit (0);
+	}
 	if (all->states->full_colectables == 1 && all->states->right_letters == 1 &&
 			all->states->won == 0)
 	{
@@ -606,11 +583,6 @@ void update_major_elements(t_all *all, int line, int column)
 		all->map->map[line][column] = 'E';
 		mlx_put_image_to_window(all->mlx, all->window, exit_mlx, column * 64, 
 			line * 64);
-	}
-	if ((check_hitbox(all, 'E') == 1) && (all->states->won == 1))
-	{
-		all->states->full_colectables = 0;
-		end_game(all);
 	}
 }
 
@@ -637,33 +609,22 @@ void	update_game(t_all *all)
 
 void	redefine_behavior_directions(t_all *all, long *time, long *last)
 {
-		static int flag = 0;
-
 		if (*time - *last > 2500000)
 		{
 			all->game->usleep = 65000;
 			(all->game->speed < 0) && (all->game->speed = -16);
 			(all->game->speed > 0) && (all->game->speed = 16);
-			if (flag == 0)
-			{
-				(all->game->speed2) = -(all->game->speed2);
-				flag = 1;
-			}
-			// sheet_to_image(all->images->letters_sheet, all->images->background, 
-			// 	all->images->grass, 25);
-			all->images->background->img = all->images->grass->img;
-		}
-		if (*time - *last > 3500000 && flag == 1)
-		{
 			(all->game->speed2) = -(all->game->speed2);
-			flag = 2;
+			sheet_to_image(all->images->letters_sheet, all->images->background, 
+				all->images->grass, 25);
 		}
-		if (*time - *last > 5500000)
+		if (*time - *last > 3200000)
+			(all->game->speed2) = -(all->game->speed2);
+		if (*time - *last > 5000000)
 		{
 			(all->game->speed2) = -(all->game->speed2);
 			(all->game->speed) = -(all->game->speed);
 			*last = *time;
-			flag = 0;
 		}
 }
 
@@ -675,8 +636,7 @@ void	redefine_behavior(t_all *all)
 		time = get_full_time();
 		if (all->game->speed == 2)
 		{
-			// all->game->shadow = 1;
-			all->images->background->img = all->game->element[indexor(&(all->play->letter_colected[all->play->letters_colected_amount - 1]))].img;
+			all->game->shadow = 1;
 			all->game->usleep = 65000;
 			(all->game->speed) = 16;
 			last = time;
@@ -686,8 +646,7 @@ void	redefine_behavior(t_all *all)
 			all->game->usleep = 20000;
 			(all->game->speed < 0) && (all->game->speed = -40);
 			(all->game->speed > 0) && (all->game->speed = 40);
-			// color_image(all->images->background, 0);
-			all->images->background->img = all->images->color->img;
+			color_image(all->images->background, 0);
 		}
 		redefine_behavior_directions(all, &time, &last);
 }
@@ -879,67 +838,16 @@ int	cmp_msg(t_all * all, char *string1, char *string2, int limit)
 	return (string1[index1] - string2[index2]);
 }
 
-void	itoa_adder(t_all *all, char (*original)[28], int *org_idx, int to_add)
-{
-	printf("string antes: %s\n", original[all->terminal->wr_line]);
-	if (to_add > 9)
-	{
-		itoa_adder(all, original, org_idx, to_add / 10);
-	}
-	original[all->terminal->wr_line][(*org_idx)++] = ((to_add % 10) + 48);
-	printf("string depois: %s\n", original[all->terminal->wr_line]);
-}
-
-void	mesage_cat_letters(t_all *all, int *line, char (*writed)[28], char *letters)
-{
-	int	let_idx;
-	int str_idx;
-	int	wr_idx;
-	char *string;
-
-	string = "mlx_put_image(\"1\", 2, 3)";
-	wr_idx = 0;
-	let_idx = -1;
-	writed[*line][all->terminal->wr_index] = '\0';
-	(*line)++;
-	while (letters[++let_idx])
-	{
-		wr_idx = 0;
-		str_idx = -1;
-		while (string[++str_idx])
-		{
-			writed[*line][wr_idx] = string[str_idx];
-			if (writed[*line][wr_idx] == '1')
-			{
-				writed[*line][wr_idx] = (all->game->element[indexor(&(letters[let_idx]))].charr);
-				if (writed[*line][wr_idx] == 'R')
-					writed[*line][wr_idx] = 'E';
-				wr_idx++;
-			}
-			else if (writed[*line][wr_idx] == '2')
-				itoa_adder(all, writed, &wr_idx, all->game->element[indexor(&(letters[let_idx]))].column);
-			else if (writed[*line][wr_idx] == '3')
-				itoa_adder(all, writed, &wr_idx, all->game->element[indexor(&(letters[let_idx]))].line);
-			else
-				wr_idx++;
-		}
-		writed[*line][wr_idx] = '\0';
-		if (letters[let_idx + 1])
-			(*line)++;
-	}
-	put_strings_on_terminal(all, *line, all->images->blank_letter->mlx_st);
-}
-
-void	message_ls(t_all *all, int *line, char (*writed)[28])
+void	message_ls(t_all *all, int line, char (*writed)[28])
 {
 	char	*to_write;
 	int		index;
 
 	to_write = NULL;
- 	if (cmp_msg(all, "ls", writed[*line], 2) == 0)
+ 	if (cmp_msg(all, "ls", writed[line], 2) == 0)
 	{
-		writed[*line][all->terminal->wr_index] = '\0';
-		(*line)++;
+		all->terminal->wr_line++;
+		line = all->terminal->wr_line;
 		index = 0;
 		if (all->states->letters_compiled == 0)
 			to_write = "   letters.c";
@@ -947,12 +855,13 @@ void	message_ls(t_all *all, int *line, char (*writed)[28])
 			to_write = "   letters.c     a.out";
 		while (to_write[index])
 		{
-			writed[*line][index] = to_write[index];
+			writed[line][index] = to_write[index];
 			index++;
 		}
-		writed[*line][index] = '\0';
+		writed[line][index] = '\0';
 		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20), 
-			16711680, writed[*line]);
+			16711680, writed[line]);
+		all->terminal->wr_index = index;
 	}
 }
 
@@ -973,51 +882,33 @@ void	message_free(t_all *all, int line, char (*writed)[28])
 		all->play->X = 0;
 		all->play->I = 0;
 		all->play->T = 0;
-		all->game->ub_current_time = all->game->ub_time + 1;
-		sheet_to_image(all->images->terminal_sheet, all->images->Y, all->images->grass, 0);
-		all->images->background->img = all->images->grass->img;
-		update_bg(all->images->letters_sheet, all->images->background, all, 25);
-		mlx_put_image_to_window(all->mlx, all->window, all->images->Y->mlx_st, all->game->element[indexor("Y")].px_column, all->game->element[indexor("Y")].px_line);
-		mlx_do_sync(all->mlx);
 	}
-}
-
-int	message_size(t_all *all, char *string)
-{
-	int index;
-	int size;
-
-	size = 0;
-	index = (all->terminal->pc_nb_size);
-	while (string[index] && string[index] != '_')
-	{
-		index++;
-		size++;
-	}
-	printf("size: %d\n", size);
-	return (size);
 }
 
 void	check_message(t_all *all, int line)
 {
-	static int	size = 0;
+	int	size;
+	int	index;
 	char (*writed)[28];
+	int	pc_nbr_size;
 
+	pc_nbr_size = all->terminal->pc_nb_size;
 	writed = all->terminal->writed;
-	size = message_size(all, writed[line]);
+	index = (all->terminal->pc_nb_size) - 1;
+	size = 0;
+	while (writed[line][++index] && writed[line][index] != '_')
+		size++;
 	if (size == 2)
-		message_ls(all, &all->terminal->wr_line, writed);
+		message_ls(all, line, writed);
 	else if ((size == 7) && (all->states->letters_compiled == 1) && 
 		(cmp_msg(all, "./a.out", writed[line], 7) == 0))
 	{
 		put_letter(all, "RXIT");
 	}
 	else if ((size == 9) && (cmp_msg(all, "malloc(", writed[line], 8) == 0))
-		all->game->memory = (writed[line][all->terminal->pc_nb_size + 7] - 48);
+		all->game->memory = (writed[line][pc_nbr_size + 7] - 48);
 	else if (size == 12)
 		message_free(all, line, writed);
-	else if (size == 13 || size == 10 || size == 9)
-		mesage_cat_letters(all, &all->terminal->wr_line, writed, "RXIT");
 	 if ((size == 12) && 
 				(cmp_msg(all, "cc letters.c", writed[line], 12)) == 0)
 		all->states->letters_compiled = 1;
@@ -1072,7 +963,7 @@ void	put_strings_on_terminal(t_all *all, int line, void *blank)
 	mlx_put_image_to_window(all->mlx, all->window_terminal, blank, 0, 10);
 	while (count < 5)
 	{
-		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (count * 20),
+		mlx_string_put(all->mlx, all->window_terminal, 10, 30 + ((count) * 20),
 			16711680, all->terminal->writed[line - 4 + count]);
 		count++;
 	}
@@ -1104,22 +995,13 @@ void	put_string_focused(t_all *all, int line, int focused)
 
 	writed = all->terminal->writed;
 	index = 0;
-	while (writed[focused][index] && (index < 27))
+	while (writed[focused][index] && (index < 28))
 	{
 		writed[line][index] = writed[focused][index];
 		index++;
 	}
-	if (index > all->terminal->pc_nb_size)
-	{
-		writed[line][index] = '\0';
-		all->terminal->wr_index = index;
-	}
-	else
-	{
-		writed[line][all->terminal->pc_nb_size] = '\0';
-		all->terminal->wr_index = all->terminal->pc_nb_size;
-	}
-	printf("resultado do switch: wr_index %d   writed line: %s\nstr focused: %s\n\n", all->terminal->wr_index, all->terminal->writed[all->terminal->wr_line], all->terminal->writed[focused]);
+	writed[line][index] = '\0';
+	all->terminal->wr_index = index;
 	mlx_put_image_to_window(all->mlx, all->window_terminal, 
 		all->images->blank_letter->mlx_st, 0, 120);
 	mlx_string_put(all->mlx, all->window_terminal, 10, 30 + (5 * 20),
@@ -1135,35 +1017,17 @@ void	key_switch_strings(t_all *all, int keycode, int line, int *focused)
 		save_current_string(all, keycode, line);
 	if ((keycode == 65362) && ((*focused) > 5))
 	{
-		printf("Key-up, focused: %d string: %s\n\n", *focused, all->terminal->writed[*focused]);			
-		--((*focused));
-		printf("Key-up, focused: %d string: %s\n\n", *focused, all->terminal->writed[*focused]);
-		if (((*focused)) == line && ((*focused) > 5))
-		{
+		if (--((*focused)) == line && ((*focused) > 5))
 			(*focused)--;
-			printf("Key-up, focused: %d string: %s\n\n", *focused, all->terminal->writed[*focused]);
-		}
 		while ((all->terminal->writed[*focused][0] != 'c') && ((*focused) > 5))
-		{
 			(*focused)--;
-			printf("Key-up, focused: %d string: %s\n\n", *focused, all->terminal->writed[*focused]);
-		}
 	}
 	else if ((keycode == 65364) && (*focused < (line + 1)) && *swift_state == 1)
 	{
-		printf("keydown, focused: %d string: %s\n", *focused, all->terminal->writed[*focused]);
-		(*focused)++;
-		printf("keydown, focused: %d string: %s\n", *focused, all->terminal->writed[*focused]);
-		if (((*focused)) == line && (*focused) < (line + 1))
-		{
-			(*focused)++; 
-			printf("keydown, focused: %d string: %s\n", *focused, all->terminal->writed[*focused]);
-		}
-		while ((all->terminal->writed[*focused][0] != 'c') && *focused < line)
-		{
+		if (++((*focused)) == line && (*focused) < (line + 1))
 			(*focused)++;
-			printf("Key-down, focused: %d current string: %s\n", *focused, all->terminal->writed[*focused]);
-		}
+		while ((all->terminal->writed[*focused][0] != 'c') && *focused < line)
+			(*focused)++;
 	}
 	put_string_focused(all, line, *focused);
 }
@@ -1227,13 +1091,8 @@ void	key_erase(t_all *all, int line, int *index)
 
 void	key_enter(t_all *all, int *line, int *index)
 {
-	int	save_line;
-
-	save_line = *line;
-	all->terminal->writed[*line][*index] = '\0';
 	check_message(all, *line);
-	if (*line != save_line)
-		all->terminal->writed[*line][*index] = '\0';
+	all->terminal->writed[*line][*index] = '\0';
 	all->terminal->writed[*line + 1][*index] = '\0';
 	put_strings_on_terminal(all, *line, all->images->blank_letter->mlx_st);
 	(*line)++;
@@ -1273,7 +1132,6 @@ int new_window_key_pressed(int keycode, void *arg)
 	t_all *all;
 
 	all = (t_all *)arg;
-	// printf("detector de tecla-> line: %d\n\n", all->terminal->wr_line);
 	if (keycode == 65505 || keycode == 65506)
 		all->states->key_shift = 1;
 	if (keycode == 65507 || keycode == 65508)
@@ -1318,107 +1176,24 @@ void open_terminal(t_all *all)
     }
 }
 
-void	display_ub_count(t_all_images *images, t_gameinfo *game, t_all *all)
-{
-	int	center;
-
-	center = ((all->map->line_len * WIDE) / 2);
-	if (game->ub_current_time > 9 && game->ub_current_time > 5)
-		sheet_to_image(images->letters_sheet, images->number1, images->wall, (game->ub_current_time / 10) - 1);
-	else
-		sheet_to_image(images->grass_wall_sheet, images->number1, NULL, 0);
-	mlx_put_image_to_window(all->mlx, all->window, images->number1->mlx_st, center - WIDE, 0 * TALL);
-	mlx_do_sync(all->mlx);
-	if (game->ub_current_time <= 5)
-	{
-		if (game->ub_current_time >= 0)
-			sheet_to_image(images->red_letters_sheet, images->number2, images->wall, ((game->ub_current_time % 10) - 1) + (10 * (((game->ub_current_time % 10)) == 0)));
-		// else
-		// 	sheet_to_image(images->red_letters_sheet, images->number2, images->wall, 9);
-		sheet_to_image(images->red_letters_sheet, images->number1, images->wall, 39);
-		mlx_put_image_to_window(all->mlx, all->window, images->number1->mlx_st, center + WIDE, 0 * TALL);
-	}
-	else
-	{
-		if (game->ub_current_time >= 0)
-			sheet_to_image(images->letters_sheet, images->number2, images->wall, ((game->ub_current_time % 10) - 1) + (10 * (((game->ub_current_time % 10)) == 0)));
-		else
-			sheet_to_image(images->letters_sheet, images->number2, images->wall, 9);			
-	}
-	mlx_put_image_to_window(all->mlx, all->window, images->number2->mlx_st, center, 0 * TALL);
-	mlx_do_sync(all->mlx);
-}
-
-void	display_indefined_behavior_alert(t_all *all)
-{
-	static int	changer = 1;
-
-	if (changer == 2)
-	{
-		sheet_to_image(all->images->terminal_sheet, all->images->Y, all->images->grass, 1);
-		changer = 1;
-	}
-	else
-	{
-		sheet_to_image(all->images->terminal_sheet, all->images->Y, all->images->grass, 2);
-		changer = 2;
-	}
-	mlx_put_image_to_window(all->mlx, all->window, all->images->Y->mlx_st, all->game->element[indexor("Y")].px_column, all->game->element[indexor("Y")].px_line);
-}
-
-void	ub_count(t_all *all)
-{
-	static long time;
-	static long last;
-
-	time = get_full_time();
-	if (all->game->ub_current_time > all->game->ub_time)
-	{
-		all->game->ub_current_time = all->game->ub_time;
-		last = time;
-		display_ub_count(all->images, all->game, all);
-		display_indefined_behavior_alert(all);
-	}
-	if (time - last > 500000)
-		display_indefined_behavior_alert(all);
-	if (time - last > 1000000)
-	{
-		// if ()
-		// all->game->ub_current_time--;
-		display_ub_count(all->images, all->game, all);
-		display_indefined_behavior_alert(all);
-		if (all->game->ub_current_time <= 0)
-		{
-			usleep(200000);
-			end_game(all);
-		}
-		last = time;
-	}
-}
-
 int game_loop(void *arg)
 {
     t_all *all = (t_all *)arg;
 
-	// printf("Cor branca: %d\n\n", ((int *)all->images->Y->img)[0]);
     if (all->states->terminal == 1)
 		open_terminal(all);
 	if (all->states->undefined_behavior == 1)
-	{
-		printf("ub count: %d \n\n\n", all->game->ub_current_time);
 		make_sound(200000);
-		ub_count(all);
-	}
     if ((all->states->key_a != 0 || all->states->key_w != 0 || 
         	all->states->key_s != 0 || all->states->key_d != 0) && 
 				all->states->terminal == 0)
     {
         move_player(all);
-		update_bg(all->images->letters_sheet, all->images->background, all, 25);
+        update_bg(all->images->letters_sheet, all, 1, 6);
 		check_player_range(all, '0');
     }
 	update_game(all);
-	update_images(all, all->play->p_pixel_column, all->play->p_pixel_line);
+	update_images(all, all->play->p_column, all->play->p_line);
 	mlx_do_sync(all->mlx);
 	usleep(all->game->usleep);
     return 0;
@@ -1432,24 +1207,25 @@ void	get_username_and_pcnumber(t_all *all)
 	size = 0;
 	fd = open("./maps/user_name.ber", O_RDONLY);
 	all->terminal->user_name = getnextline(fd);
+	printf("passou aqui\n\n\n\n");
 	if (!all->terminal->user_name)
 		all->terminal->user_name = "TERMINAL";
 	close(fd);
 	fd = open("./maps/computer_number.ber", O_RDONLY);
 	all->terminal->user_pc_number = getnextline(fd);
 	all->states->pc_number = 1;
-	if (!all->terminal->user_pc_number)
-	{
-		all->terminal->user_pc_number = "comand: ";
-		all->states->pc_number = 0;
-	}
 	while(all->terminal->user_pc_number[size])
 		size++;
 	all->terminal->pc_nb_size = size + 1;
-	close (fd);
+	if (!all->terminal->user_pc_number)
+	{
+		all->terminal->user_pc_number = "comand: ";
+		all->terminal->pc_nb_size = size + 1;
+		all->states->pc_number = 0;
+	}
 }
 
-void game_initializer(t_all *all)
+void game_initializer(t_mapinfo *s_map, t_all *all)
 {
     t_all_images *images;
 
@@ -1459,8 +1235,8 @@ void game_initializer(t_all *all)
 	images = all_images_initiator(all->mlx, all);
 	get_username_and_pcnumber(all);
     all->images = images;
-    all->window = mlx_new_window(all->mlx, all->map->line_len * 
-		64, all->map->total_lines * 64, all->map->map_name);
+    all->window = mlx_new_window(all->mlx, s_map->line_len * 
+		64, s_map->total_lines * 64, s_map->map_name);
     if (!all->window)
         exit(1);
     all->window_terminal = NULL;
@@ -1511,8 +1287,6 @@ void	general_settings(t_all *all)
 	all->game->usleep = 20000;
 	all->game->shadow = 0;
 	all->game->real_elements = "PEC10RXITYO";
-	all->game->ub_time = 15;
-	all->game->ub_current_time = all->game->ub_time + 1;
 	if (flag == 1)
 	{
 		while (all->game->real_elements[count])
@@ -1523,226 +1297,101 @@ void	general_settings(t_all *all)
 	}
 }
 
-void	init_structures(t_all *all)
+t_all	*init_structures()
 {
-	t_playerinfo	*play;
-	t_mapinfo		*map;
-	t_gameinfo		*game;
+	t_all 			*all;
+	t_playerinfo	*s_play;
+	t_mapinfo		*s_map;
+	t_gameinfo		*s_game;
 	t_states		*states;
 	t_terminalinfo 	*terminal;
 
-	play = malloc(sizeof(t_playerinfo));
-	map = malloc(sizeof(t_mapinfo));
-	game = malloc(sizeof(t_gameinfo));
+	all = malloc(sizeof(t_all));
+	s_play = malloc(sizeof(t_playerinfo));
+	s_map = malloc(sizeof(t_mapinfo));
+	s_game = malloc(sizeof(t_gameinfo));
 	states = malloc(sizeof(t_states));
 	terminal = malloc(sizeof(t_terminalinfo));
-	if (!(all && play && map && game && states && terminal))
-	{
-		write(2, "Error\nFailed structure allocation", 33);
-		exit (1) ;
-	}
-	*map = (t_mapinfo){0, 0, 0, 0, 0};
-	*play = (t_playerinfo){0, 0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', 
-		'\0', '\0', 0, 0, 0, 0};
-	*game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+	if (!(all && s_play && s_map && s_game && states && terminal))
+		return (NULL);
+	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
+	*s_play = (t_playerinfo){0, 0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
+	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 	*terminal = (t_terminalinfo){0, 0, 5, 0, 0, 0, 5, {{0}}};
-	*all = (t_all){map, play, 0, game, states, terminal, 0, 0, 0};
-}
-
-void	destroy_all_images2(void *mlx, t_all_images *images)
-{
-	if (images->player->mlx_st)
-		mlx_destroy_image(mlx, images->player->mlx_st);
-	if (images->exit->mlx_st)
-		mlx_destroy_image(mlx, images->exit->mlx_st);
-	if (images->color->mlx_st)
-		mlx_destroy_image(mlx, images->color->mlx_st);
-	if (images->blank_letter->mlx_st)
-		mlx_destroy_image(mlx, images->blank_letter->mlx_st);
-	if (images->background->mlx_st)
-		mlx_destroy_image(mlx, images->background->mlx_st);
-	if (images->number1->mlx_st)
-		mlx_destroy_image(mlx, images->number1->mlx_st);
-	if (images->number2->mlx_st)
-		mlx_destroy_image(mlx, images->number2->mlx_st);
-	if (images->terminal_sheet->st)
-		mlx_destroy_image(mlx, images->terminal_sheet->st);
-}
-
-void	destroy_all_images1(void *mlx, t_all_images *images)
-{
-	if (images->grass_wall_sheet->st)
-		mlx_destroy_image(mlx, images->grass_wall_sheet->st);
-	if (images->letters_sheet->st)
-		mlx_destroy_image(mlx, images->letters_sheet->st);
-	if (images->red_letters_sheet->st)
-		mlx_destroy_image(mlx, images->red_letters_sheet->st);		
-	if (images->wall->mlx_st)
-		mlx_destroy_image(mlx, images->wall->mlx_st);
-	if (images->grass->mlx_st)
-		mlx_destroy_image(mlx, images->grass->mlx_st);
-	if (images->collectable->mlx_st)
-		mlx_destroy_image(mlx, images->collectable->mlx_st);
-	if (images->R->mlx_st)
-		mlx_destroy_image(mlx, images->R->mlx_st);
-	if (images->X->mlx_st)
-		mlx_destroy_image(mlx, images->X->mlx_st);
-	if (images->I->mlx_st)
-		mlx_destroy_image(mlx, images->I->mlx_st);
-	if (images->T->mlx_st)
-		mlx_destroy_image(mlx, images->T->mlx_st);
-	if (images->Y->mlx_st)
-		mlx_destroy_image(mlx, images->Y->mlx_st);
-}
-
-void free_all_images2(t_all_images *images)
-{
-	if (images->I)
-		free(images->I);
-	if (images->X)
-		free(images->X);
-	if (images->T)
-		free(images->T);
-	if (images->Y)
-		free(images->Y);
-	if (images->blank_letter)
-		free(images->blank_letter);
-	if (images->color)
-		free(images->color);
-	if (images->background)
-		free(images->background);
-	if (images->number1)
-		free(images->number1);
-	if (images->number2)
-		free(images->number2);
-	if (images->terminal_sheet)
-		free(images->terminal_sheet);
-}
-
-void free_all_images1(t_all_images *images)
-{
-	if (images->grass_wall_sheet)
-		free(images->grass_wall_sheet);
-	if (images->letters_sheet)
-		free(images->letters_sheet);
-	if (images->red_letters_sheet)
-		free(images->red_letters_sheet);
-	if (images->grass)
-		free(images->grass);
-	if (images->wall)
-		free(images->wall);
-	if (images->collectable)
-		free(images->collectable);
-	if (images->player)
-		free(images->player);
-	if (images->exit)
-		free(images->exit);
-	if (images->R)
-		free(images->R);
-}
-
-void	free_structures(t_all *all)
-{
-	if (all->images)
-	{
-		destroy_all_images1(all->mlx, all->images);
-		destroy_all_images2(all->mlx, all->images);
-		free_all_images1(all->images);
-		free_all_images2(all->images);
-		free(all->images);
-	}
-	if (all->game)
-		free(all->game);
-	if (all->map)
-		free(all->map);
-	if (all->play)
-		free(all->play);
-	if (all->states)
-		free(all->states);
-	if (all->terminal)
-		free(all->terminal);
-}
-void	end_game(t_all *all)
-{
-	mlx_loop_end(all->mlx);
-	mlx_clear_window(all->mlx, all->window);
-	mlx_destroy_window(all->mlx, all->window);
-	free_map(all->map->map);
-	if (all->map->map_adress)
-		free(all->map->map_adress);
-	if (all->game->element)
-		free(all->game->element);
-	if (all->terminal->user_pc_number)
-		free(all->terminal->user_pc_number);
-	if (all->terminal->user_name)
-		free(all->terminal->user_name);
-	free_structures(all);
-	if (all->window_terminal)
-	{
-		mlx_clear_window(all->mlx, all->window_terminal);
-		mlx_destroy_window(all->mlx, all->window_terminal);
-	}
-	if (all->mlx)
-	{
-		mlx_destroy_display(all->mlx);
-		free(all->mlx);
-	}
-	free(all);
-	exit (1);
-}
-
-int	parcing(char *argv1, t_all *all)
-{
-	if (!(check_map_ber_type(argv1)))
-		return (0);
-	all->map->map_name = argv1;
-	all->map->map_adress = get_map_adress(argv1);
-	if (!(all->map->map_adress))
-		return (0);
-	all->map->total_lines = count_lines(all->map->map_adress);
-	if (!all->map->total_lines)
-		return (0);
-	all->map->map = create_map(all->map);
-	if (!(all->map->map))
-		return (0);
-	if (!check_rectangle(all->map))
-		return (0);
-	if (!check_close_walls(all->map))
-		return (0);
-	if (!(check_elements(all->map, all->play, all->game, all->states)))
-		return (0);
-	if (!check_all_paths(all->map, all->play, all->game, all->states))
-		return (0);
-	if (!check_map_size(all))
-		return (0);
-	return (1);
+	*all = (t_all){s_map, s_play, 0, s_game, states, terminal, 0, 0, 0};
+	return (all);
 }
 
 int	main(int argc, char *argv[])
 {
-	t_all 			*all;
+	// t_all 			*all;
+	t_all 			*all = malloc(sizeof(t_all));
+	t_playerinfo	*s_play = malloc(sizeof(t_playerinfo));
+	t_mapinfo		*s_map = malloc(sizeof(t_mapinfo));
+	t_gameinfo		*s_game = malloc(sizeof(t_gameinfo));
+	t_states		*states = malloc(sizeof(t_states));
+	t_terminalinfo 	*terminal = malloc(sizeof(t_terminalinfo));
 
 	if (argc != 2)
-	{
-		write(2, "Error\nIncorret amount of arguments!\n", 36);
 		return (1);
-	}
-	all = malloc (sizeof(t_all));
-	if (!all)
-	{
-		write(2, "Error\nFailed struct \"ALL\" allocation", 36);
-		return (1);
-	}
-	init_structures(all);
+	// all = init_structures();
+	*s_map = (t_mapinfo){0, 0, 0, 0, 0};
+	*s_play = (t_playerinfo){0, 0, 0, 0, 0, 0, {0}, 0, 0, 0, 0, '\0', '\0', '\0', '\0', 0, 0, 0, 0};
+	*s_game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+	*terminal = (t_terminalinfo){0, 0, 5, 0, 0, 0, 5, {{0}}};
+	*all = (t_all){s_map, s_play, 0, s_game, states, terminal, 0, 0, 0};
+	all->window_terminal = NULL;
+	all->terminal = terminal;
+	all->map = s_map;
+	all->play = s_play;
+	all->game = s_game;
+	all->states = states;
 	general_settings(all);
-	if (!(parcing(argv[1], all)))
-	{
-		write(2, "Error\nFailed due to wrong parsing", 33);
-		end_game(all);
-	}
-	game_initializer(all);
+	if (!(check_map_ber_type(argv[1])))
+		return (1);
+	s_map->map_name = argv[1];
+	s_map->map_adress = get_map_adress(argv[1]);
+	if (!(s_map->map_adress))
+		return (1);
+	// printf("Map adress123: %s\n\n\n", s_map->map_adress);
+	s_map->total_lines = count_lines(s_map->map_adress);
+	if (!s_map->total_lines)
+		return (1);
+	// write(1, "teste\n", 6);
+	s_map->map = create_map(s_map);
+	if (!(s_map->map))
+		return (1);
+	printf("\nPassou aqui\n");
+	if (!check_rectangle(s_map))
+		return (1);
+	if (!check_close_walls(s_map))
+		return (1);
+	if (!(check_elements(s_map, s_play, s_game, states)))
+		return (1);
+	// get_element_positions(s_game, s_map);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[0].charr, all->game->element[0].line, all->game->element[0].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[1].charr, all->game->element[1].line, all->game->element[1].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[2].charr, all->game->element[2].line, all->game->element[2].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[3].charr, all->game->element[3].line, all->game->element[3].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[4].charr, all->game->element[4].line, all->game->element[4].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[5].charr, all->game->element[5].line, all->game->element[5].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[6].charr, all->game->element[6].line, all->game->element[6].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[7].charr, all->game->element[7].line, all->game->element[7].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[8].charr, all->game->element[8].line, all->game->element[8].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[9].charr, all->game->element[9].line, all->game->element[9].column);
+	printf("1 element: %c  line: %d  column:  %d\n\n", all->game->element[10].charr, all->game->element[10].line, all->game->element[10].column);
+	if (!check_all_paths(s_map, s_play, s_game, states))
+		return (1);
+	// write(1, "teste123", 5);
+	if (!check_map_size(all))
+		return (1);
+	game_initializer(s_map, all);
+	printf("EU AQUI------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+	free(s_map);
 }
+//e_linefree_m
 
 // COMANDO PRA PEGAR O USER DA PESSOA e colocar num novo arquivo local
 // name=$(ls -l | awk '{print $3}' | tail -1) && echo $name >> ./maps/user_name.ber
