@@ -1,21 +1,21 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   core_parsing.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:12:19 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/11 16:26:59 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/13 22:23:39 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "parsing.h"
 
 int	count_lines(char *chosen_map, t_all *all)
 {
-	int	fd;
-	int	count;
+	int		fd;
+	int		count;
 	char	*string;
 
 	count = 0;
@@ -26,7 +26,7 @@ int	count_lines(char *chosen_map, t_all *all)
 		end_game(all);
 	}
 	string = "";
-	while(string != NULL)
+	while (string != NULL)
 	{
 		string = getnextline(fd);
 		if (string != NULL)
@@ -37,7 +37,7 @@ int	count_lines(char *chosen_map, t_all *all)
 	return (count);
 }
 
-char **create_map(t_mapinfo *map, t_all *all)
+char	**create_map(t_mapinfo *map, t_all *all)
 {
 	char	**matriz;
 	int		line;
@@ -49,7 +49,7 @@ char **create_map(t_mapinfo *map, t_all *all)
 		write(2, "Error\nFailed to get map fd\n", 27);
 		end_game(all);
 	}
-	matriz = malloc ((map->total_lines + 1) * sizeof(char *));
+	matriz = malloc((map->total_lines + 1) * sizeof(char *));
 	if (!matriz)
 	{
 		write(2, "Error\nFailed map allocation\n", 29);
@@ -57,7 +57,7 @@ char **create_map(t_mapinfo *map, t_all *all)
 		end_game(all);
 	}
 	line = -1;
-	while(++line < map->total_lines)
+	while (++line < map->total_lines)
 		matriz[line] = getnextline(fd);
 	matriz[line] = NULL;
 	return (close(fd), matriz);
@@ -88,8 +88,7 @@ void	copy_map(t_mapinfo *map, char **copy, char *ignore)
 				copy[line][index] = map->map[line][index];
 			index++;
 		}
-		copy[line][index] = '\0';
-		line++;
+		copy[line++][index] = '\0';
 	}
 }
 

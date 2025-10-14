@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   core_animations.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:13:18 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/11 16:39:29 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/13 21:50:53 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "graphic.h"
 
@@ -17,26 +17,26 @@ void	player_animation(t_all *all)
 	if (all->play->direction == 1)
 	{
 		if (all->game->usleep <= 5000 && all->play->movement == 1)
-			update_bg(all->images->speed_player, all->images->background, 
-				all, all->play->frame);
+			update_bg(all->images->speed_player, all->images->background, all,
+				all->play->frame);
 		else
-			update_bg(all->images->player_sheet, all->images->background, 
-				all, all->play->frame);
+			update_bg(all->images->player_sheet, all->images->background, all,
+				all->play->frame);
 	}
 	else
 	{
 		if (all->game->usleep <= 5000 && all->play->movement == 1)
-			update_bg(all->images->speed_player_mirror, 
-				all->images->background, all, all->play->frame);
+			update_bg(all->images->speed_player_mirror, all->images->background,
+				all, all->play->frame);
 		else
-			update_bg(all->images->player_sheet_mirror, 
-				all->images->background, all, all->play->frame);
+			update_bg(all->images->player_sheet_mirror, all->images->background,
+				all, all->play->frame);
 	}
 }
 
 void	exit_animation(t_all *all)
 {
-	static int	column; 
+	static int	column;
 	static int	line;
 	static int	flag;
 
@@ -48,18 +48,18 @@ void	exit_animation(t_all *all)
 	}
 	if (all->states->won == 1)
 	{
-		sheet_to_image(all->images->exit_sheet, all->images->exit, 
+		sheet_to_image(all->images->exit_sheet, all->images->exit,
 			all->images->grass, all->game->exit_frame);
 		mlx_put_image_to_window(all->mlx, all->window, all->images->exit->st,
-			 column, line);
+			column, line);
 	}
 }
 
 void	update_animation_frames(t_all *all, float reference)
 {
-	static long 	time;
-	static long 	last_exit;
-	static long		last_player;
+	static long	time;
+	static long	last_exit;
+	static long	last_player;
 
 	reference = (60000 * (all->game->usleep / reference));
 	time = get_full_time();

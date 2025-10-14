@@ -1,47 +1,47 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   fill_buffers.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:12:58 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/12 14:23:07 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/14 04:52:05 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "graphic.h"
 
 void	sheet_to_image(t_image *src, t_image *dst, t_image *background, int nbr)
 {
-	int src_idx;
+	int	src_idx;
 	int	dst_idx;
 	int	line;
 	int	column;
 	int	ints_per_line;
 
 	ints_per_line = ((src->bpp * dst->wide) / 32);
-	src_idx = ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide))) + ((src->
-		sizeline / 4) * ((nbr / (src->wide / dst->wide)) * dst->tall)) - 1;
+	src_idx = (src->sizeline / 4 * ((nbr / (src->wide / dst->wide)) * dst->tall)
+			) + ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide))) - 1;
 	line = -1;
 	dst_idx = 0;
 	while (++line < dst->tall)
 	{
 		column = -1;
-		while((++column < ints_per_line))
+		while ((++column < ints_per_line))
 		{
-			if (((int *)src->img)[++src_idx] == -16777216 || 
-										((int *)src->img)[src_idx] == 16777215)
+			if (((int *)src->img)[++src_idx] == -16777216
+				|| ((int *)src->img)[src_idx] == 16777215)
 				((int *)dst->img)[dst_idx] = ((int *)background->img)[dst_idx];
 			else
 				((int *)dst->img)[dst_idx] = ((int *)src->img)[src_idx];
-			dst_idx++;	
+			dst_idx++;
 		}
 		src_idx = src_idx + ((src->sizeline / 4) - (column));
 	}
 }
 
-void	color_image(t_image *image, int	flag)
+void	color_image(t_image *image, int flag)
 {
 	int	ints_per_line;
 	int	img_line;
@@ -55,7 +55,7 @@ void	color_image(t_image *image, int	flag)
 	while (img_line < image->tall)
 	{
 		count = 0;
-		while(count < ints_per_line)
+		while (count < ints_per_line)
 		{
 			((int *)image->img)[index++] = flag;
 			count++;
@@ -68,7 +68,7 @@ t_background	*calculate_vars(t_all *all, t_image *src, t_image *dst, int nbr)
 {
 	static t_background	var;
 	int					px_column;
-	int 				px_line;
+	int					px_line;
 
 	px_column = all->game->element[indexor("P")].px_column;
 	px_line = all->game->element[indexor("P")].px_line;
@@ -77,8 +77,8 @@ t_background	*calculate_vars(t_all *all, t_image *src, t_image *dst, int nbr)
 	var.difference_column = px_column - var.grid_column;
 	var.difference_line = px_line - var.grid_line;
 	var.ints_per_line = ((src->bpp * all->images->player->wide) / 32);
-	var.src_idx = ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide))) + 
-		((src->sizeline / 4) * ((nbr / (src->wide / dst->wide)) * dst->tall));
+	var.src_idx = ((dst->sizeline / 4) * (nbr % (src->wide / dst->wide)))
+		+ ((src->sizeline / 4) * ((nbr / (src->wide / dst->wide)) * dst->tall));
 	var.bg_line = var.difference_column;
 	var.bg_column = var.difference_line;
 	var.img_line = 0;
@@ -91,7 +91,7 @@ t_background	*calculate_vars(t_all *all, t_image *src, t_image *dst, int nbr)
 
 void	update_bg(t_image *src, t_image *bg, t_all *all, int nbr)
 {
-	t_background *x;
+	t_background	*x;
 
 	x = calculate_vars(all, src, all->images->player, nbr);
 	while ((x->img_line) < all->images->player->tall)
@@ -103,11 +103,11 @@ void	update_bg(t_image *src, t_image *bg, t_all *all, int nbr)
 			x->bg_line = (x->difference_line + x->img_line) % TALL;
 			x->bg_idx = (x->bg_line * (all->images->grass->sizeline / 4))
 				+ x->bg_column;
-			if ((((int *)src->img)[x->src_idx] == -16777216) || 
-					(((int *)src->img)[x->src_idx] == 16777215))
-				{
-					((int *)x->play)[x->dst_idx] = ((int *)bg->img)[x->bg_idx];
-				}
+			if ((((int *)src->img)[x->src_idx] == -16777216)
+				|| (((int *)src->img)[x->src_idx] == 16777215))
+			{
+				((int *)x->play)[x->dst_idx] = ((int *)bg->img)[x->bg_idx];
+			}
 			else
 				((int *)x->play)[x->dst_idx] = ((int *)src->img)[x->src_idx];
 			x->dst_idx++;
@@ -125,12 +125,12 @@ void	all_images_fill_buffers(t_all_images *images)
 	sheet_to_image(images->grass_wall_sheet, images->wall, NULL, 0);
 	sheet_to_image(images->collectable, images->collectable, images->grass, 0);
 	sheet_to_image(images->exit_sheet, images->exit, images->grass, 0);
-	color_image(images->color, 0);
+	color_image(images->color, 2337875);
 	color_image(images->blank_letter, 0);
-	sheet_to_image(images->let_sheet, images->F, images->grass, 15);
-	sheet_to_image(images->let_sheet, images->I, images->grass, 18);
-	sheet_to_image(images->let_sheet, images->R, images->grass, 27);
-	sheet_to_image(images->let_sheet, images->A, images->grass, 14);
-	sheet_to_image(images->terminal_sheet, images->Y, images->grass, 0);
+	sheet_to_image(images->let_sheet, images->f, images->grass, 15);
+	sheet_to_image(images->let_sheet, images->i, images->grass, 18);
+	sheet_to_image(images->let_sheet, images->r, images->grass, 27);
+	sheet_to_image(images->let_sheet, images->a, images->grass, 14);
+	sheet_to_image(images->terminal_sheet, images->y, images->grass, 0);
 	sheet_to_image(images->player_sheet, images->player, images->grass, 13);
 }

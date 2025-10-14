@@ -1,20 +1,20 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   core_data.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:12:29 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/12 11:16:57 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/14 05:38:19 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "data.h"
 
-//core_data.c --------
-void			init_structures(t_all *all);
-int				end_game(t_all *all);
+// core_data.c --------
+void	init_structures(t_all *all);
+int		end_game(t_all *all);
 
 void	init_structures(t_all *all)
 {
@@ -22,7 +22,7 @@ void	init_structures(t_all *all)
 	t_mapinfo		*map;
 	t_gameinfo		*game;
 	t_states		*states;
-	t_terminalinfo 	*terminal;
+	t_terminalinfo	*terminal;
 
 	play = malloc(sizeof(t_playerinfo));
 	map = malloc(sizeof(t_mapinfo));
@@ -35,11 +35,11 @@ void	init_structures(t_all *all)
 		end_game(all);
 	}
 	*map = (t_mapinfo){0, 0, 0, 0, 0};
-	*play = (t_playerinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-		0, 0, 0, 0, 0, 0, 0, 0, 0, {0}};
+	*play = (t_playerinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, {0}, 0};
 	*game = (t_gameinfo){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-		1, 1, 0, 1, 0, 0, 1};
+	*states = (t_states){0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+		0, 1, 0, 0, 1};
 	*terminal = (t_terminalinfo){0, 0, 0, 5, 0, 0, 0, 0, 5, {{0}}};
 	*all = (t_all){map, play, 0, game, states, terminal, 0, 0, 0};
 }
@@ -95,6 +95,6 @@ int	end_game(t_all *all)
 	free_structures(all);
 	if (all)
 		free(all);
-	exit (1);
+	exit(1);
 	return (0);
 }

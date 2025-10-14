@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/10/14 06:10:07 by otlacerd          #+#    #+#              #
+#    Updated: 2025/10/14 06:48:27 by otlacerd         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = so_long
 
 CC = cc
@@ -6,6 +18,17 @@ RM = rm -rf
 BUILD_DIR = build
 MLX_DIR = MiniLibX/minilibx-linux
 INCLUDES = -I. -I$(MLX_DIR)
+USER_DIR = modules/user_info
+USER_NAME_FILE = $(USER_DIR)/user_name.ber
+COMP_NUM_FILE = $(USER_DIR)/computer_number.ber
+
+all: user_info $(NAME)
+
+user_info: FORCE
+	@echo -n "$$(whoami)" > $(USER_NAME_FILE)
+	@echo -n "$$(hostname | cut -d'.' -f1)%" > $(COMP_NUM_FILE)
+
+FORCE:
 
 SRCS = so_long.c \
        modules/core_game/core_game.c \
@@ -39,8 +62,6 @@ SRCS = so_long.c \
        modules/terminal/terminal_utils.c
 
 OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRCS))
-
-all: $(NAME)
 
 $(NAME): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(NAME) -L $(MLX_DIR) -lmlx -lXext -lX11 -lm

@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   sub_messages.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:16:21 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/12 11:07:51 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/14 06:57:33 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "terminal.h"
 
@@ -17,7 +17,7 @@ void	error_message(t_all *all, int *line, char (*writed)[33], int flag)
 	char	*reference;
 
 	if (flag == 1)
-		reference =	" ...Program is finished...";
+		reference = " ...Program is finished...";
 	if (flag == 2)
 		reference = "Heap Overflow! Aborted.";
 	if (flag == 3)
@@ -29,8 +29,8 @@ void	error_message(t_all *all, int *line, char (*writed)[33], int flag)
 	(*line)++;
 	all->terminal->wr_index = -1;
 	while (reference[++(all->terminal->wr_index)])
-		writed[*line][all->terminal->wr_index] = 
-			reference[all->terminal->wr_index];
+		writed[*line][all->terminal->wr_index] = reference[
+			all->terminal->wr_index];
 	writed[*line][all->terminal->wr_index++] = '\0';
 }
 
@@ -47,19 +47,19 @@ void	free_memory(t_all *all)
 	all->game->speed = 2;
 	all->game->speed2 = 1;
 	all->states->undefined_behavior = 0;
-	all->play->F = 0;
-	all->play->I = 0;
-	all->play->R = 0;
-	all->play->A = 0;
+	all->play->f = 0;
+	all->play->i = 0;
+	all->play->r = 0;
+	all->play->a = 0;
 	all->game->ub_current_time = all->game->ub_time + 1;
-	sheet_to_image(all->images->terminal_sheet, all->images->Y, 
+	sheet_to_image(all->images->terminal_sheet, all->images->y,
 		all->images->grass, 0);
 	all->images->background->img = all->images->grass->img;
-	update_bg(all->images->player_sheet, all->images->background, 
-		all, all->play->frame);
-	mlx_put_image_to_window(all->mlx, all->window, all->images->Y->st, 
-		all->game->element[indexor("Y")].px_column, 
-			all->game->element[indexor("Y")].px_line);
+	update_bg(all->images->player_sheet, all->images->background, all,
+		all->play->frame);
+	mlx_put_image_to_window(all->mlx, all->window, all->images->y->st,
+		all->game->element[indexor("y")].px_column,
+		all->game->element[indexor("y")].px_line);
 	mlx_do_sync(all->mlx);
 }
 
@@ -73,8 +73,8 @@ void	message_clear(t_all *all)
 
 int	message_size(t_all *all, char *string)
 {
-	int index;
-	int size;
+	int	index;
+	int	size;
 
 	size = 0;
 	index = (all->terminal->pc_nb_size);

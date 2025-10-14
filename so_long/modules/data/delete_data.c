@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   delete_data.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:12:38 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/11 16:30:07 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/13 21:42:57 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "data.h"
 
@@ -18,11 +18,11 @@ void	free_map(char **map)
 
 	line = 0;
 	if (!map)
-		return;
+		return ;
 	while (map[line] != NULL)
 	{
 		free(map[line]);
-		line++;	
+		line++;
 	}
 	free(map);
 }
@@ -46,7 +46,7 @@ void	destroy_all_images1(void *mlx, t_all_images *images)
 	if (images->speed_player_mirror->st)
 		mlx_destroy_image(mlx, images->speed_player_mirror->st);
 	if (images->exit_sheet->st)
-		mlx_destroy_image(mlx, images->exit_sheet->st);		
+		mlx_destroy_image(mlx, images->exit_sheet->st);
 	if (images->wall->st)
 		mlx_destroy_image(mlx, images->wall->st);
 	if (images->grass->st)
@@ -57,16 +57,16 @@ void	destroy_all_images1(void *mlx, t_all_images *images)
 
 void	destroy_all_images2(void *mlx, t_all_images *images)
 {
-	if (images->F->st)
-		mlx_destroy_image(mlx, images->F->st);
-	if (images->I->st)
-		mlx_destroy_image(mlx, images->I->st);
-	if (images->R->st)
-		mlx_destroy_image(mlx, images->R->st);
-	if (images->A->st)
-		mlx_destroy_image(mlx, images->A->st);
-	if (images->Y->st)
-		mlx_destroy_image(mlx, images->Y->st);
+	if (images->f->st)
+		mlx_destroy_image(mlx, images->f->st);
+	if (images->i->st)
+		mlx_destroy_image(mlx, images->i->st);
+	if (images->r->st)
+		mlx_destroy_image(mlx, images->r->st);
+	if (images->a->st)
+		mlx_destroy_image(mlx, images->a->st);
+	if (images->y->st)
+		mlx_destroy_image(mlx, images->y->st);
 	if (images->player->st)
 		mlx_destroy_image(mlx, images->player->st);
 	if (images->exit->st)
@@ -83,7 +83,7 @@ void	destroy_all_images2(void *mlx, t_all_images *images)
 		mlx_destroy_image(mlx, images->nbr2->st);
 }
 
-void free_all_images1(t_all_images *images)
+void	free_all_images1(t_all_images *images)
 {
 	if (images->grass_wall_sheet)
 		free(images->grass_wall_sheet);
@@ -111,20 +111,20 @@ void free_all_images1(t_all_images *images)
 		free(images->collectable);
 }
 
-void free_all_images2(t_all_images *images)
+void	free_all_images2(t_all_images *images)
 {
 	if (images->player)
 		free(images->player);
-	if (images->F)
-		free(images->F);
-	if (images->I)
-		free(images->I);
-	if (images->R)
-		free(images->R);
-	if (images->A)
-		free(images->A);
-	if (images->Y)
-		free(images->Y);
+	if (images->f)
+		free(images->f);
+	if (images->i)
+		free(images->i);
+	if (images->r)
+		free(images->r);
+	if (images->a)
+		free(images->a);
+	if (images->y)
+		free(images->y);
 	if (images->blank_letter)
 		free(images->blank_letter);
 	if (images->color)

@@ -1,35 +1,35 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   message_cat.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:16:13 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/12 10:58:32 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/14 06:01:45 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "terminal.h"
 
-void	message_cat_n_clear(t_all* all, int *line, char (*writed)[33], int size)
+void	message_cat_n_clear(t_all *all, int *line, char (*writed)[33], int size)
 {
-	printf("\n\n\nEntrou no message cat n clear\nsize: %d\n\n", size);
 	if ((size == 5) && (cmp_msg(all, "clear", writed[*line], 5) == 0))
 	{
 		message_clear(all);
 	}
-	else if ((size == 13) && (cmp_msg(all, "cat letters.c", 
-		writed[*line], 13) == 0))
+	else if ((size == 13) && (cmp_msg(all, "cat letters.c", writed[*line],
+				13) == 0))
 	{
-		cat_letters_c(all, line, writed, "FIRA");
+		cat_letters_c(all, line, writed, "fira");
 	}
-	else if ((size == 9) && (all->states->letters_compiled == 1) && 
-		(cmp_msg(all, "cat a.out", writed[*line], 9) == 0))
+	else if ((size == 9) && (all->states->letters_compiled == 1)
+		&& (cmp_msg(all, "cat a.out", writed[*line], 9) == 0))
 	{
 		cat_a_out(line, writed, &all->terminal->wr_index);
 	}
-	else if ((size == 10) && (cmp_msg(all, "cat readme", writed[*line], 10) == 0))
+	else if ((size == 10) && (cmp_msg(all, "cat readme", writed[*line],
+				10) == 0))
 	{
 		cat_readme(all, line, writed);
 	}
@@ -37,9 +37,9 @@ void	message_cat_n_clear(t_all* all, int *line, char (*writed)[33], int size)
 
 void	cat_readme(t_all *all, int *line, char (*writed)[33])
 {
-	int count;
-	int	index;
-	char *reference;
+	int		count;
+	int		index;
+	char	*reference;
 
 	index = 0;
 	count = 3;
@@ -66,34 +66,34 @@ void	cat_readme(t_all *all, int *line, char (*writed)[33])
 void	cat_let_nbr(char (*writed)[33], t_all *all, int *let_idx, char *letters)
 {
 	int	*wr_idx;
-	int *line;
+	int	*line;
 
 	line = &all->terminal->wr_line;
 	wr_idx = &all->terminal->wr_index;
 	if (writed[*line][*wr_idx] == '1')
 	{
-		writed[*line][*wr_idx] = (all->game->element[indexor(&(letters
-			[*let_idx]))].charr);
-		if (writed[*line][*wr_idx] == 'A')
-			writed[*line][*wr_idx] = 'E';
+		writed[*line][*wr_idx] = (all->game->element[indexor(&(letters[*let_idx]
+						))].charr);
+		if (writed[*line][*wr_idx] == 'a')
+			writed[*line][*wr_idx] = 'e';
 		(*wr_idx)++;
 	}
 	else if (writed[*line][*wr_idx] == '2')
-		itoa_adder(all, writed, &(*wr_idx), all->game->element[indexor
-			(&(letters[*let_idx]))].column);
+		itoa_adder(all, writed, &(*wr_idx),
+			all->game->element[indexor(&(letters[*let_idx]))].column);
 	else if (writed[*line][*wr_idx] == '3')
-		itoa_adder(all, writed, &(*wr_idx), all->game->element[indexor
-			(&(letters[*let_idx]))].line);
+		itoa_adder(all, writed, &(*wr_idx),
+			all->game->element[indexor(&(letters[*let_idx]))].line);
 	else
 		(*wr_idx)++;
 }
 
 void	cat_letters_c(t_all *all, int *line, char (*writed)[33], char *letters)
 {
-	int	let_idx;
-	int str_idx;
-	int	*wr_idx;
-	char *string;
+	int		let_idx;
+	int		str_idx;
+	int		*wr_idx;
+	char	*string;
 
 	string = "   mlx_put_image(\"1\", 2, 3)";
 	wr_idx = &all->terminal->wr_index;

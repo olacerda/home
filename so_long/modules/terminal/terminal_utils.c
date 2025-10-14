@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   terminal_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:17:23 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/12 11:00:13 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/14 07:08:28 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "terminal.h"
 
@@ -23,8 +23,8 @@ void	itoa_adder(t_all *all, char (*original)[33], int *org_idx, int to_add)
 
 void	put_pcnumber_on_terminal(t_all *all, int line)
 {
-	char *user_pc;
-	int	*index;
+	char	*user_pc;
+	int		*index;
 
 	user_pc = all->terminal->line_start;
 	index = &all->terminal->wr_index;
@@ -38,24 +38,29 @@ void	put_pcnumber_on_terminal(t_all *all, int line)
 	all->terminal->writed[line][*index] = '\0';
 }
 
-void	flush_strings_on_terminal(t_all *all, int line, void *blank)
+int	flush_strings_on_terminal(t_all *all, int line, void *blank)
 {
 	int	count;
 
 	count = 0;
-	mlx_put_image_to_window(all->mlx, all->window_terminal, blank, 0, 0);
-	while (count < 6)
+	if (all->states->terminal)
 	{
-		mlx_string_put(all->mlx, all->window_terminal, 10, 20 + (count * 20),
-			16711680, all->terminal->writed[line - 5 + count]);
-		count++;
+		mlx_put_image_to_window(all->mlx, all->window_terminal, blank, 0, 20);
+		while (count < 6)
+		{
+			mlx_string_put(all->mlx, all->window_terminal, 10, 40 + (
+					count * 20), 16711680, all->terminal->writed[line - 5
+				+ count]);
+			count++;
+		}
 	}
+	return (0);
 }
 
 void	put_string_focused(t_all *all, int line, int focused)
 {
+	int		index;
 	char	(*writed)[33];
-	int	index;
 
 	writed = all->terminal->writed;
 	index = 0;
@@ -74,21 +79,21 @@ void	put_string_focused(t_all *all, int line, int focused)
 		writed[line][all->terminal->pc_nb_size] = '\0';
 		all->terminal->wr_index = all->terminal->pc_nb_size;
 	}
-	mlx_put_image_to_window(all->mlx, all->window_terminal, 
-		all->images->blank_letter->st, 0, 130);
-	mlx_string_put(all->mlx, all->window_terminal, 10, (7 * 20),
-		16711680, writed[line]);
+	mlx_put_image_to_window(all->mlx, all->window_terminal,
+		all->images->blank_letter->st, 0, 150);
+	mlx_string_put(all->mlx, all->window_terminal, 10, (8 * 20), 16711680,
+		writed[line]);
 }
 
 void	save_current_string(t_all *all, int keycode, int line)
 {
-	char (*writed)[33];
-	int *line_size;
+	int		*line_size;
+	char	(*writed)[33];
 
 	writed = all->terminal->writed;
 	line_size = &all->terminal->current_line_size;
-	if (all->states->swifting_strings == 0 && keycode == 65362 && 
-		all->terminal->string_focused > 5)
+	if (all->states->swifting_strings == 0 && keycode == 65362
+		&& all->terminal->string_focused > 5)
 	{
 		while ((writed[line][*line_size] != '_') && writed[line][*line_size])
 		{

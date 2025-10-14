@@ -1,22 +1,23 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   check_map_info.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: olacerda <olacerda@student.42.fr>          +#+  +:+       +#+        */
+/*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 15:12:06 by olacerda          #+#    #+#             */
-/*   Updated: 2025/10/11 16:11:10 by olacerda         ###   ########.fr       */
+/*   Updated: 2025/10/13 21:59:36 by otlacerd         ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "parsing.h"
 
-int		check_map_adrees_need(char *map_name)
+int	check_map_adrees_need(char *map_name)
 {
 	int		index;
 	int		mp_size;
 	char	*comparison;
+
 	mp_size = 0;
 	while (map_name[mp_size])
 		mp_size++;
@@ -79,7 +80,7 @@ int	check_map_ber_type(char *name)
 		index++;
 	if (index < 5)
 		return (0);
-	index -= 4;      
+	index -= 4;
 	while ((file_type[++f_index] == name[index]) && (file_type[f_index]))
 		index++;
 	if (file_type[f_index] == '\0')
