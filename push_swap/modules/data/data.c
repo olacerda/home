@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 20:30:18 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 02:22:49 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/19 05:33:52 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,8 @@ t_stackinfo	*init_struct(void)
 
 void	end_data(t_stackinfo *stack)
 {
-	if (stack->head)
-		lstclear(&stack->head);
+	if (stack->head_a)
+		lstclear(&stack->head_a);
 	if (stack)
 	{
 		free(stack);

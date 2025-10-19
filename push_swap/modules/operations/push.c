@@ -1,35 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push_swap.h                                        :+:      :+:    :+:   */
+/*   push.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/16 20:55:13 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/19 05:34:40 by otlacerd         ###   ########.fr       */
+/*   Created: 2025/10/19 04:29:04 by otlacerd          #+#    #+#             */
+/*   Updated: 2025/10/19 05:29:59 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PUSH_SWAP_H
-# define PUSH_SWAP_H
+#include "operations.h"
 
-# include <stdlib.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <fcntl.h>
-
-typedef struct	s_list
+void	push(t_list **head1, t_list **head2)
 {
-	int				index;
-	int 			content;
-	struct s_list 	*next;
-} 				t_list;
+	t_list *temp_list;
 
-typedef struct	s_stackinfo
+	if (!(*head2))
+		return ;
+	temp_list = (*head2);
+	(*head2) = (*head2)->next;
+	temp_list->next = (*head1);
+	(*head1) = temp_list;
+}
+
+void	pa(t_list **head1, t_list **head2)
 {
-	t_list		*head_a;
-	t_list		*tail_a;
-	int 		size;
-}				t_stackinfo;
+	push(head1, head2);
+	write(1, "pa\n", 3);
+}
 
-#endif
+void	pb(t_list **head1, t_list **head2)
+{
+	push (head2, head1);
+	write(1, "pb\n", 3);
+}

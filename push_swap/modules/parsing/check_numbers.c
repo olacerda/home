@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 00:12:48 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 04:51:13 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/19 06:00:57 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	check_one_number(int *index, char *string, t_stackinfo *stack)
 	else if (string[*index] == '+' || string[*index] == '-')
 	{
 		(*index)++;
-		if (string[*index] == '\0')
+		if (string[*index] == ' ' || string[*index] == '\0')
 			put_error(stack);
 	}
 	if (string[*index] == '\0')
@@ -54,7 +54,7 @@ int	check_numbers_in_string(char *string, t_stackinfo *stack)
 	return (number_count);
 }
 
-int	count_numbers(int argc, char *argv[], t_stackinfo *stack)
+int	check_and_count_numbers(int argc, char *argv[], t_stackinfo *stack)
 {
 	int	line;
 	int numbers_count;
@@ -86,7 +86,7 @@ int	check_double_numbers(t_stackinfo *stack)
 	t_list *iter;
 	int		number;
 
-	temp = stack->head;
+	temp = stack->head_a;
 	while (temp != NULL)
 	{
 		number = temp->content;
@@ -102,6 +102,36 @@ int	check_double_numbers(t_stackinfo *stack)
 		temp = temp->next;
 	}
 	return (1);
+}
+
+int	check_if_its_ordered(t_stackinfo *stack)
+{
+	t_list *current;
+	t_list *next;
+	int	index;
+
+	index = 0;
+	current = stack->head_a;
+	if (current == NULL)
+		return (0);
+	while (current != NULL)
+	{
+		next = current->next;
+		if (next == NULL)
+		{
+			return (0);
+		}
+		if (current->content > next->content)
+		{
+			return (1);
+		}
+		current = current->next;
+		if (current == NULL)
+		{
+			return (0);
+		}
+	}
+	return (0);
 }
 
 // int	main(int argc, char *argv[])

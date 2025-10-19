@@ -6,12 +6,12 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:56:44 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 00:43:59 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/19 05:45:20 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "list_tools.h"
-void	lstadd_back(t_list **lst, t_list *new)
+void	lstadd_back(t_list **lst, t_list *new, t_stackinfo *stack)
 {
 	t_list	*temp;
 
@@ -29,6 +29,7 @@ void	lstadd_back(t_list **lst, t_list *new)
 			temp = temp->next;
 		temp->next = new;
 		new->next = NULL;
+		stack->tail_a = new;
 	}
 }
 

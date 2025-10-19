@@ -6,7 +6,7 @@
 #    By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/16 20:55:15 by otlacerd          #+#    #+#              #
-#    Updated: 2025/10/18 04:44:41 by otlacerd         ###   ########.fr        #
+#    Updated: 2025/10/19 05:35:36 by otlacerd         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,6 +31,10 @@ SRCS = push_swap.c \
 	   modules/list_tools/lstclear.c \
 	   modules/list_tools/lstnew.c \
 	   modules/list_tools/lstsize.c \
+	   modules/operations/push.c \
+	   modules/operations/reverse_rotate.c \
+	   modules/operations/rotate.c \
+	   modules/operations/swap.c \
 # 	   modules/list_tools/list_tools_utils.c \
 # 	   modules/list_tools/lstdelone.c \
 # 	   modules/list_tools/lstiter.c \

@@ -1,35 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push_swap.h                                        :+:      :+:    :+:   */
+/*   teste.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/16 20:55:13 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/19 05:34:40 by otlacerd         ###   ########.fr       */
+/*   Created: 2025/10/18 19:49:56 by otlacerd          #+#    #+#             */
+/*   Updated: 2025/10/18 19:53:27 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PUSH_SWAP_H
-# define PUSH_SWAP_H
+#include <stdio.h>
+#include <unistd.h>
 
-# include <stdlib.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <fcntl.h>
-
-typedef struct	s_list
+int main(void)
 {
-	int				index;
-	int 			content;
-	struct s_list 	*next;
-} 				t_list;
-
-typedef struct	s_stackinfo
-{
-	t_list		*head_a;
-	t_list		*tail_a;
-	int 		size;
-}				t_stackinfo;
-
-#endif
+	size_t	a;
+	
+	printf("%d\n\n", 1 << 31);
+}

@@ -6,34 +6,11 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 17:00:47 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 04:38:43 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/19 06:02:46 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parsing.h"
-
-// int special_atoi(char *string, int *index, int alter_index)
-// {
-// 	static int	result;
-
-// 	if (string[*index] == '\0')
-// 		return (result);
-// 	if (alter_index == 0)
-// 	{
-// 		result = 0;
-// 		alter_index = *index;
-// 	}
-// 	if (string[*index] != '\0' || string[*index] != ' ')
-// 	{
-// 		++(*index);
-// 		special_atoi(string, index, alter_index + 1);
-// 	}
-// 	if (string[alter_index] == '\0' || string[alter_index] == ' ')
-// 		alter_index--;
-// 	if (string[alter_index] != '\0')
-// 		result = result * 10 + string[alter_index] - 48;
-// 	return (result);
-// }
 
 int	special_atoi(char *string, int *index, t_stackinfo *stack, int negative)
 {
@@ -62,9 +39,9 @@ void	create_1_node_per_nbr(char *string, t_stackinfo *stack, int *index)
 	negative = 0;
 	while(((string[*index] >= 9 && string[*index] <= 13)
 		|| string[*index] == 32) && string[*index])
-	{
-		(*index)++;
-	}
+		{
+			(*index)++;
+		}
 	if ((string[*index]) && (string[*index] == '+' || string[*index] == '-'))
 		if (string[(*index)++] == '-')
 			negative = 1;
@@ -72,15 +49,37 @@ void	create_1_node_per_nbr(char *string, t_stackinfo *stack, int *index)
 	{
 		if (first)
 		{
-			stack->head = lstnew(special_atoi(string, index, stack, negative));
-			stack->head->next = NULL;
-			stack->tail = stack->head;
+			stack->head_a = lstnew(special_atoi(string, index, stack, negative));
+			stack->head_a->next = NULL;
 			first = 0;
 		}
 		else
-			lstadd_front(&stack->head, lstnew(special_atoi(string, index, stack,
-				negative)));
+			lstadd_back(&stack->head_a, lstnew(special_atoi(string, index, stack,
+				negative)), stack);
 	}
+}
+
+void	assign_stack_index(t_stackinfo *stack)
+{
+	t_list *temp;
+	t_list *current;
+	int	count;
+
+	temp = stack->head_a;
+	current = stack->head_a;
+	while (current != NULL)
+	{
+		temp = stack->head_a;
+		count = 0;
+		while (temp != NULL)
+		{
+			if (temp->content > current->content)
+				count++;
+			temp = temp->next;
+		}
+		current->index = stack->size - count;
+		current = current->next;
+	}	
 }
 
 void	create_stack_list(t_stackinfo *stack, char *argv[], int argc)

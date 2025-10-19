@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 22:18:05 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 02:22:38 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/18 19:25:33 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # include "../../push_swap.h"
 
-void	lstadd_back(t_list **lst, t_list *new);
+void	lstadd_back(t_list **lst, t_list *new, t_stackinfo *stack);
 void	lstadd_front(t_list **lst, t_list *new);
 void	lstclear(t_list **lst);
 t_list	*lstnew(int content);
