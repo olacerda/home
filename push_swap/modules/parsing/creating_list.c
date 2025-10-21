@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 17:00:47 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/19 06:02:46 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/21 10:29:25 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,11 +37,9 @@ void	create_1_node_per_nbr(char *string, t_stackinfo *stack, int *index)
 	int			negative;
 
 	negative = 0;
-	while(((string[*index] >= 9 && string[*index] <= 13)
-		|| string[*index] == 32) && string[*index])
-		{
-			(*index)++;
-		}
+	while (((string[*index] >= 9 && string[*index] <= 13)
+			|| string[*index] == 32) && string[*index])
+		(*index)++;
 	if ((string[*index]) && (string[*index] == '+' || string[*index] == '-'))
 		if (string[(*index)++] == '-')
 			negative = 1;
@@ -49,21 +47,22 @@ void	create_1_node_per_nbr(char *string, t_stackinfo *stack, int *index)
 	{
 		if (first)
 		{
-			stack->head_a = lstnew(special_atoi(string, index, stack, negative));
+			stack->head_a = lstnew(special_atoi(string, index, stack,
+						negative));
 			stack->head_a->next = NULL;
 			first = 0;
 		}
 		else
-			lstadd_back(&stack->head_a, lstnew(special_atoi(string, index, stack,
-				negative)), stack);
+			lstadd_back(&stack->head_a, lstnew(special_atoi(string, index,
+						stack, negative)), stack);
 	}
 }
 
 void	assign_stack_index(t_stackinfo *stack)
 {
-	t_list *temp;
-	t_list *current;
-	int	count;
+	t_list	*temp;
+	t_list	*current;
+	int		count;
 
 	temp = stack->head_a;
 	current = stack->head_a;
@@ -79,7 +78,7 @@ void	assign_stack_index(t_stackinfo *stack)
 		}
 		current->index = stack->size - count;
 		current = current->next;
-	}	
+	}
 }
 
 void	create_stack_list(t_stackinfo *stack, char *argv[], int argc)
@@ -120,7 +119,7 @@ void	create_stack_list(t_stackinfo *stack, char *argv[], int argc)
 // 	printf("number_count: %d\n", number_count);
 // }
 
-//main min max int
+// main min max int
 // int	main(void)
 // {
 // 	printf("%d\n\n", (1 << 31));

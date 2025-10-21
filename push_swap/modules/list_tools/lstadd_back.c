@@ -6,11 +6,12 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/28 19:56:44 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/19 05:45:20 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/21 10:30:24 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "list_tools.h"
+
 void	lstadd_back(t_list **lst, t_list *new, t_stackinfo *stack)
 {
 	t_list	*temp;
@@ -43,14 +44,10 @@ void	lstadd_back(t_list **lst, t_list *new, t_stackinfo *stack)
 
 // 	result = ft_lstlast(head)->content;
 // 	printf("Last node: %s\n", result);
-	
 // 	ft_lstadd_back(&head, node2);
-	
 // 	result = ft_lstlast(head)->content;
 // 	printf("Last node: %s\n", result);
-
 // 	ft_lstadd_back(&head, node3);
-
 // 	result = ft_lstlast(head)->content;
 // 	printf("Last node: %s\n", result);
 // }

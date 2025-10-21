@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 20:43:44 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 02:11:02 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/21 10:31:24 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ t_list	*lstnew(int content)
 // 		printf("Antes: NULL\n");
 // 	else
 // 		printf("Antes: %s\n", (char *)new->content);
-		
 // 	new = ft_lstnew(content);
 // 	if (new == NULL)
 // 		printf("Antes: NULL");

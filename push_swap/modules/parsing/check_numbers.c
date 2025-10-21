@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/18 00:12:48 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/19 06:00:57 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/21 10:29:54 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 
 int	check_one_number(int *index, char *string, t_stackinfo *stack)
 {
-	while(((string[*index] >= 9 && string[*index] <= 13)
-		|| string[*index] == 32) && string[*index] != '\0')
+	while (((string[*index] >= 9 && string[*index] <= 13)
+			|| string[*index] == 32) && string[*index] != '\0')
 		(*index)++;
 	if (((string[*index] < '+' || string[*index] == ',' || string[*index] > '9')
-		|| (string[*index] > '-' && string[*index] < '0')) && string[*index])
+			|| (string[*index] > '-' && string[*index] < '0'))
+		&& string[*index])
 		put_error(stack);
 	else if (string[*index] == '+' || string[*index] == '-')
 	{
@@ -30,8 +31,8 @@ int	check_one_number(int *index, char *string, t_stackinfo *stack)
 		return (0);
 	if (string[*index] && (string[*index] >= '0' && string[*index] <= '9'))
 	{
-		while (string[*index]
-			&& (string[*index] >= '0' && string[*index] <= '9'))
+		while (string[*index] && (string[*index] >= '0'
+				&& string[*index] <= '9'))
 			(*index)++;
 	}
 	if ((string[*index] < '0' || string[*index] > '9') && string[*index] != ' '
@@ -57,7 +58,7 @@ int	check_numbers_in_string(char *string, t_stackinfo *stack)
 int	check_and_count_numbers(int argc, char *argv[], t_stackinfo *stack)
 {
 	int	line;
-	int numbers_count;
+	int	numbers_count;
 	int	result;
 
 	line = 1;
@@ -82,8 +83,8 @@ int	check_and_count_numbers(int argc, char *argv[], t_stackinfo *stack)
 
 int	check_double_numbers(t_stackinfo *stack)
 {
-	t_list *temp;
-	t_list *iter;
+	t_list	*temp;
+	t_list	*iter;
 	int		number;
 
 	temp = stack->head_a;
@@ -106,9 +107,9 @@ int	check_double_numbers(t_stackinfo *stack)
 
 int	check_if_its_ordered(t_stackinfo *stack)
 {
-	t_list *current;
-	t_list *next;
-	int	index;
+	t_list	*current;
+	t_list	*next;
+	int		index;
 
 	index = 0;
 	current = stack->head_a;
@@ -118,9 +119,7 @@ int	check_if_its_ordered(t_stackinfo *stack)
 	{
 		next = current->next;
 		if (next == NULL)
-		{
 			return (0);
-		}
 		if (current->content > next->content)
 		{
 			return (1);

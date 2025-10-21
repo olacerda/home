@@ -6,7 +6,7 @@
 /*   By: otlacerd <otlacerd@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 22:51:48 by otlacerd          #+#    #+#             */
-/*   Updated: 2025/10/18 04:15:27 by otlacerd         ###   ########.fr       */
+/*   Updated: 2025/10/21 10:26:38 by otlacerd         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	strlength(char *string)
 	return (size);
 }
 
-//strlength
+// strlength
 // int	main(void)
 // {
 // 	char *teste = "oi isso e um teste";
@@ -33,6 +33,3 @@ int	strlength(char *string)
 // 	str_size = strlength(teste);
 // 	printf("String Size: %d\n", str_size);
 // }
-
-
-
